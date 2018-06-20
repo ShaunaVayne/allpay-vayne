@@ -10,6 +10,7 @@
 
 	<modules>
 		<module>allpay-spring-cloud</module>
+		<module>allpay-web</module>
 	</modules>
 
 
