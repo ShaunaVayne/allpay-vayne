@@ -53,11 +53,6 @@ public class OrderController {
 
 	}
 
-
-
-
-
-
 	/*@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping("getExcel2")
 	public ExcelPoiInfo getExcel() throws IOException {

@@ -2,7 +2,9 @@ package cn.vayne.web.service;
 
 import cn.vayne.web.domain.ExcelPoiReq;
 import cn.vayne.web.domain.saas.OrderInfo;
+import cn.vayne.web.domain.saasshop.ShopDO;
 import cn.vayne.web.repositorys.sass.OrderRepository;
+import cn.vayne.web.repositorys.sassshop.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,9 +33,17 @@ public class OrderService {
 	@Autowired
 	private OrderRepository orderRepository;
 
+	@Autowired
+	private ShopRepository shopRepository;
+
 	public HSSFWorkbook getExcel(ExcelPoiReq req) {
-		List<OrderInfo> entities = orderRepository.findAll();
 		HSSFWorkbook workbook = new HSSFWorkbook();
+		List<OrderInfo> entities = orderRepository.findAll();
+		List<ShopDO> shopDOS = shopRepository.findAll();
+		HashMap<String, ShopDO> shopMaps = new HashMap<>();
+		for (ShopDO shopDO : shopDOS) {
+			shopMaps.put(String.valueOf(shopDO.getId()),shopDO);
+		}
 		try {
 			if(entities.size() > 0) {
 				Sheet sheet = workbook.createSheet("测试数据统计表");
