@@ -1,4 +1,4 @@
-package cn.vayne.web.domain;
+package cn.vayne.web.domain.saas;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

@@ -1,6 +1,6 @@
-package cn.vayne.web.repositorys;
+package cn.vayne.web.repositorys.sass;
 
-import cn.vayne.web.domain.OrderInfo;
+import cn.vayne.web.domain.saas.OrderInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -11,6 +11,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @Version: 1.0.0
  */
 public interface OrderRepository extends JpaRepository<OrderInfo, Long> {
-
 
 }

@@ -1,12 +1,14 @@
 package cn.vayne.web.controller;
 
-import cn.vayne.web.domain.OrderInfo;
-import cn.vayne.web.repositorys.OrderRepository;
+import cn.vayne.web.domain.ExcelPoiInfo;
+import cn.vayne.web.domain.ExcelPoiReq;
+import cn.vayne.web.domain.saas.OrderInfo;
+import cn.vayne.web.repositorys.sass.OrderRepository;
+import cn.vayne.web.repositorys.sassshop.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,12 +38,16 @@ public class OrderController {
 	@Autowired
 	private OrderRepository orderRepository;
 
+	@Autowired
+	private ShopRepository shopRepository;
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping("getExcel")
-	public Object getExcel(HttpServletResponse response,HttpServletRequest request) throws IOException {
+	public void getExcel(ExcelPoiReq req, HttpServletResponse response, HttpServletRequest request) throws IOException {
 		List<OrderInfo> entities = orderRepository.findAll();
+		//List<ShopDO> shopDOS = shopRepository.findAll();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-		try(SXSSFWorkbook workbook = new SXSSFWorkbook()) {
+		try(HSSFWorkbook workbook = new HSSFWorkbook()) {
 			if(entities.size() > 0) {
 				Sheet sheet = workbook.createSheet("测试数据统计表");
 				sheet.setDefaultColumnWidth((short) 20);
@@ -50,7 +56,7 @@ public class OrderController {
 				//正文样式
 				CellStyle styleTable = getContentStyle(workbook);
 				Row titleRow = sheet.createRow(sheet.getLastRowNum());
-				String[] column = { "序号", "订单号","订单状态","支付方式"};
+				String[] column = { "订单编号", "门店CRM","门店名称","省份","城市","门店地址","订单创建日期","订单支付日期	","订单核销日期","消费者姓名","消费者联系方式","价格","数量","支付金额","支付方式","订单状态","安装状态","是否有赠品","订单来源","消费者备注"};
 				Cell cellTitle = null;
 				for (int i = 0; i < column.length; i++) {
 					cellTitle = titleRow.createCell(i);
@@ -83,7 +89,7 @@ public class OrderController {
 						"数据为空 或查询方式错误请重新查询并导出" + "##请优先点击查询按钮 再点击导出");
 			}
 			response.setContentType("application/x-excel;charset=UTF-8");
-			String filename = "测试数据统计表"+dateTime+".xlsx";
+			String filename = "测试数据统计表"+dateTime+".xls";
 			String agent = request.getHeader("user-agent");
 			filename = encodeDownloadFilename(filename, agent);
 			response.setHeader("Content-Disposition", "attachment;filename="
@@ -92,15 +98,18 @@ public class OrderController {
 		}catch (Exception e) {
 			log.error(e.getMessage(),e);
 		}
-		return "ok";
+		/*ExcelPoiInfo excelPoiInfo = new ExcelPoiInfo();
+		excelPoiInfo.put(10000,"ok");
+		excelPoiInfo.put("flag",true);
+		return excelPoiInfo;*/
 	}
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping("getExcel2")
-	public Object getExcel() throws IOException {
+	public ExcelPoiInfo getExcel() throws IOException {
 		List<OrderInfo> entities = orderRepository.findAll();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 		String tempXls = "/Users/vayne/myself/tip/data/"+dateTime+".xlsx";
-		try(SXSSFWorkbook workbook = new SXSSFWorkbook(); FileOutputStream os = new FileOutputStream(tempXls)) {
+		try(HSSFWorkbook workbook = new HSSFWorkbook(); FileOutputStream os = new FileOutputStream(tempXls)) {
 			mkdirs(tempXls);
 			if(entities.size() > 0) {
 				Sheet sheet = workbook.createSheet("测试数据统计表");
@@ -148,7 +157,9 @@ public class OrderController {
 			tempXls = null;
 			log.error(e.getMessage(),e);
 		}
-		return "ok";
+		ExcelPoiInfo excelPoiInfo = new ExcelPoiInfo();
+		excelPoiInfo.put(10000,"ok");
+		return excelPoiInfo;
 	}
 
 	public static String encodeDownloadFilename(String filename, String agent)
@@ -161,7 +172,7 @@ public class OrderController {
 	}
 
 	// 正文样式
-	public CellStyle getContentStyle(SXSSFWorkbook workbook){
+	public CellStyle getContentStyle(HSSFWorkbook workbook){
 		CellStyle style2 = workbook.createCellStyle();
 		style2.setFillForegroundColor(HSSFColor.WHITE.index);
 		style2.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
@@ -174,7 +185,7 @@ public class OrderController {
 		return style2;
 	}
 
-	public CellStyle getHeadStyle(SXSSFWorkbook workbook) {
+	public CellStyle getHeadStyle(HSSFWorkbook workbook) {
 		// 生成第一层标题样式
 		CellStyle style = workbook.createCellStyle();
 		style.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
