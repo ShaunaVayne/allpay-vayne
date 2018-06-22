@@ -1,4 +1,4 @@
-package cn.vayne.web.domain;
+package cn.vayne.web.domain.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

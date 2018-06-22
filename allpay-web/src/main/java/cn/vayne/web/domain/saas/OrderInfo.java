@@ -74,7 +74,17 @@ public class OrderInfo {
 
     private String isDeleted;
 
-    public Long getId() {
+    private Date payTime;
+
+	public Date getPayTime() {
+		return payTime;
+	}
+
+	public void setPayTime(Date payTime) {
+		this.payTime = payTime;
+	}
+
+	public Long getId() {
         return id;
     }
 

@@ -1,6 +1,6 @@
 package cn.vayne.web.service;
 
-import cn.vayne.web.domain.ExcelPoiReq;
+import cn.vayne.web.domain.DTO.ExcelPoiReq;
 import cn.vayne.web.domain.saas.OrderInfo;
 import cn.vayne.web.domain.saasshop.ShopDO;
 import cn.vayne.web.repositorys.sass.OrderRepository;
@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +53,7 @@ public class OrderService {
 				Sheet sheet = workbook.createSheet("订单统计表");
 				sheet.setDefaultColumnWidth((short) 20);
 				log.info("门店:{}","ok");
-				int a = 10 / 0;
+				//int a = 10 / 0;
 				// 生成第一层标题样式
 				CellStyle style = getHeadStyle(workbook);
 				//正文样式
@@ -67,7 +69,7 @@ public class OrderService {
 				}
 				Cell cellTable = null;
 				for (OrderInfo entity : entities) {
-					Long shopId = entity.getShopId();
+					String shopId = String.valueOf(entity.getShopId());
 					ShopDO shopDO = null;
 					if(shopId != null) {
 						Set<String> shopIds = shopMaps.keySet();
@@ -112,17 +114,17 @@ public class OrderService {
 					cellTable.setCellStyle(styleTable);
 
 					cellTable = dataRow.createCell(7);//订单创建日期
-					cellTable.setCellValue(entity.getCreatedTime());
+					cellTable.setCellValue(timeToString(entity.getCreatedTime()));
 					cellTable.setCellStyle(styleTable);
 
 					// TODO 支付时间字段待确认
 					cellTable = dataRow.createCell(8);//订单支付日期
-					cellTable.setCellValue(entity.getCreatedTime());
+					cellTable.setCellValue(timeToString(entity.getPayTime()));
 					cellTable.setCellStyle(styleTable);
 
 
 					cellTable = dataRow.createCell(9);//订单核销日期
-					cellTable.setCellValue(entity.getFinishTime());
+					cellTable.setCellValue(timeToString(entity.getFinishTime()));
 					cellTable.setCellStyle(styleTable);
 
 					cellTable = dataRow.createCell(10);//消费者姓名
@@ -139,7 +141,7 @@ public class OrderService {
 
 					//TODO 数量待定
 					cellTable = dataRow.createCell(13);//数量
-					cellTable.setCellValue(entity.getFinishTime());
+					cellTable.setCellValue(timeToString(entity.getFinishTime()));
 					cellTable.setCellStyle(styleTable);
 
 					cellTable = dataRow.createCell(14);//支付金额
@@ -251,6 +253,15 @@ public class OrderService {
 			log.error(e.getMessage(),e);
 		}
 		return workbook;
+	}
+
+	private String timeToString(Date time) {
+		String dateString = "";
+		if(time != null) {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			dateString = formatter.format(time);
+		}
+		return dateString;
 	}
 
 	// 正文样式
