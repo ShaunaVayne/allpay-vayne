@@ -1,6 +1,7 @@
 package cn.vayne.web.controller;
 
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
+import cn.vayne.web.model.OrderInfo;
 import cn.vayne.web.repositorys.sass.OrderRepository;
 import cn.vayne.web.repositorys.sassshop.ShopRepository;
 import cn.vayne.web.service.OrderService;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: WangKun
@@ -29,11 +31,6 @@ import java.util.Date;
 @Slf4j
 public class OrderController {
 
-	@Autowired
-	private OrderRepository orderRepository;
-
-	@Autowired
-	private ShopRepository shopRepository;
 
 	@Autowired
 	private OrderService orderService;
@@ -50,67 +47,16 @@ public class OrderController {
 		response.setHeader("Content-Disposition", "attachment;filename="
 				+ filename);
 		workbook.write(response.getOutputStream());
-
 	}
 
-	/*@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping("getExcel2")
-	public ExcelPoiInfo getExcel() throws IOException {
-		List<OrderInfo> entities = orderRepository.findAll();
-		String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-		String tempXls = "/Users/vayne/myself/tip/data/"+dateTime+".xlsx";
-		try(HSSFWorkbook workbook = new HSSFWorkbook(); FileOutputStream os = new FileOutputStream(tempXls)) {
-			mkdirs(tempXls);
-			if(entities.size() > 0) {
-				Sheet sheet = workbook.createSheet("测试数据统计表");
-				sheet.setDefaultColumnWidth((short) 20);
-				// 生成第一层标题样式
-				CellStyle style = getHeadStyle(workbook);
-				//正文样式
-				CellStyle styleTable = getContentStyle(workbook);
-				Row titleRow = sheet.createRow(sheet.getLastRowNum());
-				String[] column = { "序号", "订单号","订单状态","支付方式"};
-				Cell cellTitle = null;
-				for (int i = 0; i < column.length; i++) {
-					cellTitle = titleRow.createCell(i);
-					cellTitle.setCellValue(column[i]);
-					cellTitle.setCellStyle(style);
-				}
-				Cell cellTable = null;
-				for (OrderInfo entity : entities) {
-					Row dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
-					cellTable = dataRow.createCell(0);
-					cellTable.setCellValue(entity.getId());
-					cellTable.setCellStyle(styleTable);
-
-					cellTable = dataRow.createCell(1);
-					cellTable.setCellValue(entity.getOrderNo());
-					cellTable.setCellStyle(styleTable);
-
-					cellTable = dataRow.createCell(2);
-					cellTable.setCellValue(entity.getOrderStatus());
-					cellTable.setCellStyle(styleTable);
-
-					cellTable = dataRow.createCell(3);
-					cellTable.setCellValue(entity.getPaymentType());
-					cellTable.setCellStyle(styleTable);
-				}
-			}else {
-				Sheet sheet = workbook.createSheet("卡密重置明细数据");
-				Row headRow = sheet.createRow(0);
-				headRow.createCell(0).setCellValue(
-						"数据为空 或查询方式错误请重新查询并导出" + "##请优先点击查询按钮 再点击导出");
-			}
-			workbook.write(os);
-			os.flush();
-		}catch (Exception e) {
-			tempXls = null;
-			log.error(e.getMessage(),e);
-		}
-		ExcelPoiInfo excelPoiInfo = new ExcelPoiInfo();
-		excelPoiInfo.put(10000,"ok");
-		return excelPoiInfo;
-	}*/
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping("testMapper")
+	public Object testMapper(ExcelPoiReq req) {
+		log.info("请求参数:{}",req);
+		List<OrderInfo> orderInfos = orderService.testMapper(req);
+		log.info("查询返回参数:{}",orderInfos);
+		return orderInfos;
+	}
 
 	public static String encodeDownloadFilename(String filename, String agent)
 			throws IOException {

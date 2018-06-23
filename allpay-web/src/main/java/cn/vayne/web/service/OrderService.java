@@ -3,6 +3,8 @@ package cn.vayne.web.service;
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
 import cn.vayne.web.domain.saas.OrderInfo;
 import cn.vayne.web.domain.saasshop.ShopDO;
+import cn.vayne.web.mapper.OrderInfoMapper;
+import cn.vayne.web.model.OrderInfoExample;
 import cn.vayne.web.repositorys.sass.OrderRepository;
 import cn.vayne.web.repositorys.sassshop.ShopRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,9 @@ public class OrderService {
 
 	@Autowired
 	private ShopRepository shopRepository;
+
+	@Autowired
+	private OrderInfoMapper orderInfoMapper;
 
 	public HSSFWorkbook getExcel(ExcelPoiReq req) {
 		HSSFWorkbook workbook = new HSSFWorkbook();
@@ -297,17 +302,12 @@ public class OrderService {
 		return style;
 	}
 
-	/**
-	 * 创建文件夹
-	 * @param filePath
-	 * @throws IOException
-	 */
-	private void mkdirs(String filePath) throws IOException {
-		File file = new File(filePath);
-		if(!file.exists()){
-			log.info("开始创建文件夹："+filePath);
-			file.mkdirs();
-			log.info("创建文件夹成功："+filePath);
-		}
+	public List<cn.vayne.web.model.OrderInfo> testMapper(ExcelPoiReq req) {
+		OrderInfoExample example = new OrderInfoExample();
+		OrderInfoExample.Criteria criteria = example.createCriteria();
+		criteria.andCreatedTimeGreaterThanOrEqualTo(new Date(Long.parseLong(req.getBegTime())));
+		criteria.andCreatedTimeLessThanOrEqualTo(new Date(Long.parseLong(req.getEndTime())));
+		List<cn.vayne.web.model.OrderInfo> orderInfos = orderInfoMapper.selectByExample(example);
+		return orderInfos;
 	}
 }

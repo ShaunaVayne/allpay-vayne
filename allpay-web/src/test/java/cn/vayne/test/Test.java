@@ -2,6 +2,9 @@ package cn.vayne.test;
 
 import cn.vayne.test.domain.ShopDO;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,5 +49,23 @@ public class Test {
 		ShopDO shopDO = new ShopDO();
 		System.out.println(shopDO.getCity());
 
+	}
+
+	@org.junit.Test
+	public void test3() throws ParseException {
+		long timeStamp = System.currentTimeMillis();
+		System.out.println(timeStamp);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String sd = sdf.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
+		System.out.println(sd);
+
+		String s = "2018-06-19 00:00:01";
+		//2018-06-19 00:00:01	2018-06-15 00:00:01
+		String res;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date date = simpleDateFormat.parse(s);
+		long ts = date.getTime();
+		res = String.valueOf(ts);
+		System.out.println(res);
 	}
 }
