@@ -13,6 +13,12 @@
                 <a href="http://localhost:8088/excel/getExcel?begTime=2018-06-15 00:00:01&endTime=2018-06-19 00:00:01">导出</a>
             </td>
         </tr>
+        <tr>
+            <td>
+                <input type="submit" id="myclick2" onclick="test3();"/>
+                <a href="http://localhost:8088/excel/testMapper?begTime=1528992001000&endTime=1529337601000">测试</a>
+            </td>
+        </tr>
     </table>
 </body>
 <script>
@@ -25,7 +31,9 @@
 				console.log(data);
 			}
         });
-		//$.get("http://localhost:8088/excel/getExcel", { begTime: "2018-06-15 00:00:01", endTime: "2018-06-19 00:00:01" });
+	}
+	function test3() {
+		console.log(33);
 	}
 </script>
 </html>

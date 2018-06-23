@@ -1,15 +1,8 @@
-package cn.vayne.web.domain.saas;
+package cn.vayne.web.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.util.Date;
 
-@Entity
 public class OrderInfo {
-
-	@Id
-	@GeneratedValue
     private Long id;
 
     private String orderNo;
@@ -25,6 +18,8 @@ public class OrderInfo {
     private Date cancelTime;
 
     private Date finishTime;
+
+    private Date payTime;
 
     private String receiverUserName;
 
@@ -58,6 +53,8 @@ public class OrderInfo {
 
     private String carModel;
 
+    private String payId;
+
     private String carDetail;
 
     private Date createdTime;
@@ -74,17 +71,7 @@ public class OrderInfo {
 
     private String isDeleted;
 
-    private Date payTime;
-
-	public Date getPayTime() {
-		return payTime;
-	}
-
-	public void setPayTime(Date payTime) {
-		this.payTime = payTime;
-	}
-
-	public Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -146,6 +133,14 @@ public class OrderInfo {
 
     public void setFinishTime(Date finishTime) {
         this.finishTime = finishTime;
+    }
+
+    public Date getPayTime() {
+        return payTime;
+    }
+
+    public void setPayTime(Date payTime) {
+        this.payTime = payTime;
     }
 
     public String getReceiverUserName() {
@@ -274,6 +269,14 @@ public class OrderInfo {
 
     public void setCarModel(String carModel) {
         this.carModel = carModel;
+    }
+
+    public String getPayId() {
+        return payId;
+    }
+
+    public void setPayId(String payId) {
+        this.payId = payId;
     }
 
     public String getCarDetail() {
