@@ -40,7 +40,6 @@ public class ExcelPoiService {
 	@Autowired
 	private ShopDOMapper shopDOMapper;
 
-
 	public HSSFWorkbook excelOut(ExcelPoiReq req) {
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		OrderInfoExample example = new OrderInfoExample();
