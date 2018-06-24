@@ -4,6 +4,7 @@ import cn.vayne.web.domain.DTO.ExcelPoiReq;
 import cn.vayne.web.domain.saas.OrderInfo;
 import cn.vayne.web.domain.saasshop.ShopDO;
 import cn.vayne.web.mapper.OrderInfoMapper;
+import cn.vayne.web.mapper.ShopDOMapper;
 import cn.vayne.web.model.OrderInfoExample;
 import cn.vayne.web.repositorys.sass.OrderRepository;
 import cn.vayne.web.repositorys.sassshop.ShopRepository;
@@ -44,6 +45,9 @@ public class OrderService {
 
 	@Autowired
 	private OrderInfoMapper orderInfoMapper;
+
+	@Autowired
+	private ShopDOMapper shopDOMapper;
 
 	public HSSFWorkbook getExcel(ExcelPoiReq req) {
 		HSSFWorkbook workbook = new HSSFWorkbook();
@@ -308,6 +312,8 @@ public class OrderService {
 		criteria.andCreatedTimeGreaterThanOrEqualTo(new Date(Long.parseLong(req.getBegTime())));
 		criteria.andCreatedTimeLessThanOrEqualTo(new Date(Long.parseLong(req.getEndTime())));
 		List<cn.vayne.web.model.OrderInfo> orderInfos = orderInfoMapper.selectByExample(example);
+		cn.vayne.web.model.ShopDO shopDO = shopDOMapper.selectByPrimaryKey(36l);
+		log.info("信息:{}",shopDO);
 		return orderInfos;
 	}
 }

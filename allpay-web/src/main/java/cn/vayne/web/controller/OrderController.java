@@ -39,7 +39,7 @@ public class OrderController {
 	@RequestMapping("getExcel")
 	public void getExcel(ExcelPoiReq req, HttpServletResponse response, HttpServletRequest request) throws IOException {
 		HSSFWorkbook workbook = orderService.getExcel(req);
-		String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+		String dateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 		response.setContentType("application/x-excel;charset=UTF-8");
 		String filename = "订单统计表"+ dateTime +".xls";
 		String agent = request.getHeader("user-agent");
