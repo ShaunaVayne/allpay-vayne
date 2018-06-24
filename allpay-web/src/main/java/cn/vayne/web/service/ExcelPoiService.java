@@ -1,10 +1,12 @@
 package cn.vayne.web.service;
 
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
-import cn.vayne.web.domain.saas.OrderInfo;
-import cn.vayne.web.domain.saasshop.ShopDO;
-import cn.vayne.web.repositorys.sass.OrderRepository;
-import cn.vayne.web.repositorys.sassshop.ShopRepository;
+import cn.vayne.web.mapper.OrderInfoMapper;
+import cn.vayne.web.mapper.ShopDOMapper;
+import cn.vayne.web.model.OrderInfo;
+import cn.vayne.web.model.OrderInfoExample;
+import cn.vayne.web.model.ShopDO;
+import cn.vayne.web.model.ShopDOExample;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -23,25 +25,33 @@ import java.util.Set;
 
 /**
  * @Author: WangKun
- * @Description: test
- * @Date: Created in 2018/6/22 下午2:46
+ * @Description:
+ * @Date: Created in 2018/6/24 13:15
  * @ProjectName: allpay-vayne
  * @Version: 1.0.0
  */
 @Service
 @Slf4j
-public class OrderService {
+public class ExcelPoiService {
 
 	@Autowired
-	private OrderRepository orderRepository;
+	private OrderInfoMapper orderInfoMapper;
 
 	@Autowired
-	private ShopRepository shopRepository;
+	private ShopDOMapper shopDOMapper;
 
-	public HSSFWorkbook getExcel(ExcelPoiReq req) {
+
+	public HSSFWorkbook excelOut(ExcelPoiReq req) {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		List<OrderInfo> entities = orderRepository.findAll();
-		List<ShopDO> shopDOS = shopRepository.findAll();
+		OrderInfoExample example = new OrderInfoExample();
+		OrderInfoExample.Criteria criteria = example.createCriteria();
+		criteria.andCreatedTimeGreaterThanOrEqualTo(new Date(Long.parseLong(req.getBegTime())));
+		criteria.andCreatedTimeLessThanOrEqualTo(new Date(Long.parseLong(req.getEndTime())));
+		List<OrderInfo> entities = orderInfoMapper.selectByExample(example);
+		ShopDOExample shopDOExample = new ShopDOExample();
+		ShopDOExample.Criteria criteria1 = shopDOExample.createCriteria();
+		criteria1.andIsDeleteNotEqualTo(1);
+		List<ShopDO> shopDOS = shopDOMapper.selectByExample(shopDOExample);
 		HashMap<String, ShopDO> shopMaps = new HashMap<>();
 		for (ShopDO shopDO : shopDOS) {
 			shopMaps.put(String.valueOf(shopDO.getId()),shopDO);
@@ -51,14 +61,12 @@ public class OrderService {
 				Sheet sheet = workbook.createSheet("订单统计表");
 				sheet.setDefaultColumnWidth((short) 20);
 				log.info("门店:{}","ok");
-				//int a = 10 / 0;
-				// 生成第一层标题样式
 				CellStyle style = getHeadStyle(workbook);
 				//正文样式
 				CellStyle styleTable = getContentStyle(workbook);
 				Row titleRow = sheet.createRow(sheet.getLastRowNum());
 				// TODO  用户id
-				String[] column = { "订单编号","用户昵称","门店CRM","门店名称","省份","城市","门店地址","订单创建日期","订单支付日期	","订单核销日期","消费者姓名","消费者联系方式","价格","数量","支付金额","支付方式","订单状态","安装状态","是否有赠品","订单来源","消费者备注"};
+				String[] column = { "订单编号","用户昵称","门店CRM","门店名称","省份","城市","门店地址","订单创建日期","订单支付日期","订单核销日期","消费者姓名","消费者联系方式","价格","数量","支付金额","支付方式","订单状态","安装状态","是否有赠品","订单来源","消费者备注"};
 				Cell cellTitle = null;
 				for (int i = 0; i < column.length; i++) {
 					cellTitle = titleRow.createCell(i);
@@ -246,8 +254,9 @@ public class OrderService {
 				Row headRow = sheet.createRow(0);
 				headRow.createCell(0).setCellValue(
 						"数据为空 或查询方式错误请重新查询并导出" + "##请优先点击查询按钮 再点击导出");
+
 			}
-		}catch (Exception e) {
+		}catch(Exception e) {
 			log.error(e.getMessage(),e);
 		}
 		return workbook;

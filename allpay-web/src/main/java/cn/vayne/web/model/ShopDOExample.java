@@ -1590,7 +1590,7 @@ public class ShopDOExample {
             return (Criteria) this;
         }
 
-        public Criteria andIsDeleteNotEqualTo(Boolean value) {
+        public Criteria andIsDeleteNotEqualTo(int value) {
             addCriterion("is_delete <>", value, "isDelete");
             return (Criteria) this;
         }
