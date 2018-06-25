@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @Author: WangKun
@@ -51,18 +52,27 @@ public class ExcelPoiService {
 		req = changeTime(req);
 		// 组合查询
 		List<ItemDO> itemDOS = orderInfoMapper.selectItemByTime(req);
-		HashMap<String, ItemDO> itemMap = new HashMap<>();
-		itemDOS.stream().forEach(e -> {
-			itemMap.put(e.getOrderId(),e);
-		});
+		HashMap<String, ItemDO> itemMap = itemDOS.stream().collect(Collectors.toMap(
+				e -> e.getOrderId(),
+				e -> e,
+				(x, y) -> {
+					throw new AssertionError();
+				},
+				HashMap::new
+		));
 		ShopDOExample shopDOExample = new ShopDOExample();
 		ShopDOExample.Criteria criteria1 = shopDOExample.createCriteria();
 		criteria1.andIsDeleteNotEqualTo(1);
 		List<ShopDO> shopDOS = shopDOMapper.selectByExample(shopDOExample);
-		HashMap<String, ShopDO> shopMaps = new HashMap<>();
-		shopDOS.stream().forEach(e -> {
-			shopMaps.put(String.valueOf(e.getId()),e);
-		});
+		HashMap<String, ShopDO> shopMaps = shopDOS.stream().collect(Collectors.toMap(
+				e -> String.valueOf(e.getId()),
+				e -> e,
+				(x, y) -> {
+					throw new AssertionError();
+				},
+				HashMap::new
+		));
+
 		try {
 			if(entities.size() > 0) {
 				Sheet sheet = workbook.createSheet("订单统计表");
