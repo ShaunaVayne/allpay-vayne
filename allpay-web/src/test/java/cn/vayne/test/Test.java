@@ -68,4 +68,12 @@ public class Test {
 		res = String.valueOf(ts);
 		System.out.println(res);
 	}
+
+	@org.junit.Test
+	public void test4() {
+		long timeStamp = 1528992001000l;
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String sd = sdf.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
+		System.out.println(sd);
+	}
 }

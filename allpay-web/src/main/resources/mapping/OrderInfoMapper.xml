@@ -456,4 +456,17 @@
       is_deleted = #{isDeleted,jdbcType=CHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="selectItemByTime" parameterType="cn.vayne.web.domain.DTO.ExcelPoiReq" resultType="cn.vayne.web.model.ItemDO">
+	  SELECT
+	  sum( item_nums ) 'itemNums',
+	  group_concat( DISTINCT item_id ) 'itemIds',
+	  GROUP_CONCAT( DISTINCT item_name ) 'itemNames',
+	  order_id 'orderId'
+	  FROM
+	  order_items
+	  WHERE
+	  order_id IN ( SELECT id FROM order_info WHERE created_time &gt;= #{begTime} AND created_time &lt;#{endTime} )
+	  GROUP BY
+	  order_id
+  </select>
 </mapper>
