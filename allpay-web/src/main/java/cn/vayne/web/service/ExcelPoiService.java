@@ -60,9 +60,9 @@ public class ExcelPoiService {
 		criteria1.andIsDeleteNotEqualTo(1);
 		List<ShopDO> shopDOS = shopDOMapper.selectByExample(shopDOExample);
 		HashMap<String, ShopDO> shopMaps = new HashMap<>();
-		for (ShopDO shopDO : shopDOS) {
-			shopMaps.put(String.valueOf(shopDO.getId()),shopDO);
-		}
+		shopDOS.stream().forEach(e -> {
+			shopMaps.put(String.valueOf(e.getId()),e);
+		});
 		try {
 			if(entities.size() > 0) {
 				Sheet sheet = workbook.createSheet("订单统计表");
@@ -86,7 +86,6 @@ public class ExcelPoiService {
 				for (OrderInfo entity : entities) {
 					String shopId = String.valueOf(entity.getShopId());
 					if(shopId != null) {
-						//shopDO = (ShopDO) getObjctForMap(shopId, shopMaps);
 						Set<String> shopIds = shopMaps.keySet();
 						if(shopIds.contains(shopId)) {
 							shopDO = shopMaps.get(shopId);
@@ -103,18 +102,6 @@ public class ExcelPoiService {
 					}else {
 						itemDO = new ItemDO("","","","");
 					}
-					/*OrderItemsDOExample orderItemsDOExample = new OrderItemsDOExample();
-					OrderItemsDOExample.Criteria criteria2 = orderItemsDOExample.createCriteria();
-					criteria2.andOrderIdEqualTo(entity.getId());
-					List<OrderItemsDO> orderItemsDOS = orderItemsDOMapper.selectByExample(orderItemsDOExample);
-					if(orderItemsDOS != null && orderItemsDOS.size() > 0) {
-						itemDO = orderItemsDOMapper.selectItemByOrderId(entity.getId());
-						log.info("参数:{}",itemDO);
-					}else {
-						// 表示对应的订单号没有关联明细表， 暂无数据
-						itemDO = new ItemDO("","","","");
-					}*/
-
 					Row dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
 					cellTable = dataRow.createCell(0);//订单编号
 					cellTable.setCellValue(entity.getOrderNo());
@@ -296,16 +283,6 @@ public class ExcelPoiService {
 			log.error(e.getMessage(),e);
 		}
 		return workbook;
-	}
-
-	private Object getObjctForMap(String shopId, HashMap<String,ShopDO> shopMaps) {
-		/*Set<String> shopIds = shopMaps.keySet();
-		if(shopIds.contains(shopId)) {
-			shopDO = shopMaps.get(shopId);
-		}else {
-			shopDO = new ShopDO();
-		}*/
-		return null;
 	}
 
 	private ExcelPoiReq changeTime(ExcelPoiReq req) {
