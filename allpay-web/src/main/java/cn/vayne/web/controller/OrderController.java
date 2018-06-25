@@ -1,9 +1,7 @@
 package cn.vayne.web.controller;
 
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
-import cn.vayne.web.model.OrderInfo;
-import cn.vayne.web.repositorys.sass.OrderRepository;
-import cn.vayne.web.repositorys.sassshop.ShopRepository;
+import cn.vayne.web.service.ExcelPoiService;
 import cn.vayne.web.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -17,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @Author: WangKun
@@ -35,11 +32,14 @@ public class OrderController {
 	@Autowired
 	private OrderService orderService;
 
+	@Autowired
+	private ExcelPoiService excelPoiService;
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping("getExcel")
 	public void getExcel(ExcelPoiReq req, HttpServletResponse response, HttpServletRequest request) throws IOException {
 		HSSFWorkbook workbook = orderService.getExcel(req);
-		String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+		String dateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 		response.setContentType("application/x-excel;charset=UTF-8");
 		String filename = "订单统计表"+ dateTime +".xls";
 		String agent = request.getHeader("user-agent");
@@ -51,11 +51,21 @@ public class OrderController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping("testMapper")
-	public Object testMapper(ExcelPoiReq req) {
+	public void testMapper(ExcelPoiReq req, HttpServletResponse response, HttpServletRequest request) {
 		log.info("请求参数:{}",req);
-		List<OrderInfo> orderInfos = orderService.testMapper(req);
-		log.info("查询返回参数:{}",orderInfos);
-		return orderInfos;
+		HSSFWorkbook workbook = excelPoiService.excelOut(req);
+		String dateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+		response.setContentType("application/x-excel;charset=UTF-8");
+		String filename = "订单统计表"+ dateTime +".xls";
+		String agent = request.getHeader("user-agent");
+		try {
+			filename = encodeDownloadFilename(filename, agent);
+			response.setHeader("Content-Disposition", "attachment;filename="
+					+ filename);
+			workbook.write(response.getOutputStream());
+		} catch (Exception e) {
+			log.error("导出报表错误:{}",e);
+		}
 	}
 
 	public static String encodeDownloadFilename(String filename, String agent)
