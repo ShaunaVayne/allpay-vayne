@@ -51,6 +51,10 @@ public class ExcelPoiService {
 		req = changeTime(req);
 		// 组合查询
 		List<ItemDO> itemDOS = orderInfoMapper.selectItemByTime(req);
+		HashMap<String, ItemDO> itemMap = new HashMap<>();
+		itemDOS.stream().forEach(e -> {
+			itemMap.put(e.getOrderId(),e);
+		});
 		ShopDOExample shopDOExample = new ShopDOExample();
 		ShopDOExample.Criteria criteria1 = shopDOExample.createCriteria();
 		criteria1.andIsDeleteNotEqualTo(1);
@@ -82,6 +86,7 @@ public class ExcelPoiService {
 				for (OrderInfo entity : entities) {
 					String shopId = String.valueOf(entity.getShopId());
 					if(shopId != null) {
+						//shopDO = (ShopDO) getObjctForMap(shopId, shopMaps);
 						Set<String> shopIds = shopMaps.keySet();
 						if(shopIds.contains(shopId)) {
 							shopDO = shopMaps.get(shopId);
@@ -91,7 +96,14 @@ public class ExcelPoiService {
 					}else {
 						shopDO = new ShopDO();
 					}
-					OrderItemsDOExample orderItemsDOExample = new OrderItemsDOExample();
+					String orderNo = entity.getOrderNo();
+					Set<String> itemOrderIds = itemMap.keySet();
+					if(itemOrderIds.contains(orderNo)) {
+						itemDO = itemMap.get(orderNo);
+					}else {
+						itemDO = new ItemDO("","","","");
+					}
+					/*OrderItemsDOExample orderItemsDOExample = new OrderItemsDOExample();
 					OrderItemsDOExample.Criteria criteria2 = orderItemsDOExample.createCriteria();
 					criteria2.andOrderIdEqualTo(entity.getId());
 					List<OrderItemsDO> orderItemsDOS = orderItemsDOMapper.selectByExample(orderItemsDOExample);
@@ -101,7 +113,7 @@ public class ExcelPoiService {
 					}else {
 						// 表示对应的订单号没有关联明细表， 暂无数据
 						itemDO = new ItemDO("","","","");
-					}
+					}*/
 
 					Row dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
 					cellTable = dataRow.createCell(0);//订单编号
@@ -284,6 +296,16 @@ public class ExcelPoiService {
 			log.error(e.getMessage(),e);
 		}
 		return workbook;
+	}
+
+	private Object getObjctForMap(String shopId, HashMap<String,ShopDO> shopMaps) {
+		/*Set<String> shopIds = shopMaps.keySet();
+		if(shopIds.contains(shopId)) {
+			shopDO = shopMaps.get(shopId);
+		}else {
+			shopDO = new ShopDO();
+		}*/
+		return null;
 	}
 
 	private ExcelPoiReq changeTime(ExcelPoiReq req) {
