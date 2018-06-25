@@ -1,5 +1,7 @@
 package cn.vayne.web.mapper;
 
+import cn.vayne.web.domain.DTO.ExcelPoiReq;
+import cn.vayne.web.model.ItemDO;
 import cn.vayne.web.model.OrderInfo;
 import cn.vayne.web.model.OrderInfoExample;
 import java.util.List;
@@ -16,4 +18,7 @@ public interface OrderInfoMapper {
     int updateByPrimaryKeySelective(OrderInfo record);
 
     int updateByPrimaryKey(OrderInfo record);
+
+	List<ItemDO> selectItemByTime(ExcelPoiReq req);
+
 }

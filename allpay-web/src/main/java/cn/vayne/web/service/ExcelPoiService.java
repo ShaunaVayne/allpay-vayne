@@ -2,11 +2,9 @@ package cn.vayne.web.service;
 
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
 import cn.vayne.web.mapper.OrderInfoMapper;
+import cn.vayne.web.mapper.OrderItemsDOMapper;
 import cn.vayne.web.mapper.ShopDOMapper;
-import cn.vayne.web.model.OrderInfo;
-import cn.vayne.web.model.OrderInfoExample;
-import cn.vayne.web.model.ShopDO;
-import cn.vayne.web.model.ShopDOExample;
+import cn.vayne.web.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -40,6 +38,9 @@ public class ExcelPoiService {
 	@Autowired
 	private ShopDOMapper shopDOMapper;
 
+	@Autowired
+	private OrderItemsDOMapper orderItemsDOMapper;
+
 	public HSSFWorkbook excelOut(ExcelPoiReq req) {
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		OrderInfoExample example = new OrderInfoExample();
@@ -47,6 +48,9 @@ public class ExcelPoiService {
 		criteria.andCreatedTimeGreaterThanOrEqualTo(new Date(Long.parseLong(req.getBegTime())));
 		criteria.andCreatedTimeLessThanOrEqualTo(new Date(Long.parseLong(req.getEndTime())));
 		List<OrderInfo> entities = orderInfoMapper.selectByExample(example);
+		req = changeTime(req);
+		// 组合查询
+		List<ItemDO> itemDOS = orderInfoMapper.selectItemByTime(req);
 		ShopDOExample shopDOExample = new ShopDOExample();
 		ShopDOExample.Criteria criteria1 = shopDOExample.createCriteria();
 		criteria1.andIsDeleteNotEqualTo(1);
@@ -65,7 +69,7 @@ public class ExcelPoiService {
 				CellStyle styleTable = getContentStyle(workbook);
 				Row titleRow = sheet.createRow(sheet.getLastRowNum());
 				// TODO  用户id
-				String[] column = { "订单编号","用户昵称","门店CRM","门店名称","省份","城市","门店地址","订单创建日期","订单支付日期","订单核销日期","消费者姓名","消费者联系方式","价格","数量","支付金额","支付方式","订单状态","安装状态","是否有赠品","订单来源","消费者备注"};
+				String[] column = { "订单编号","用户昵称","门店CRM","门店名称","省份","城市","门店地址","订单创建日期","订单支付日期","订单核销日期","消费者姓名","消费者联系方式","产品标题","商品CODE","价格","数量","支付金额","支付方式","订单状态","安装状态","是否有赠品","订单来源","消费者备注"};
 				Cell cellTitle = null;
 				for (int i = 0; i < column.length; i++) {
 					cellTitle = titleRow.createCell(i);
@@ -73,9 +77,10 @@ public class ExcelPoiService {
 					cellTitle.setCellStyle(style);
 				}
 				Cell cellTable = null;
+				ShopDO shopDO = null;
+				ItemDO itemDO = null;
 				for (OrderInfo entity : entities) {
 					String shopId = String.valueOf(entity.getShopId());
-					ShopDO shopDO = null;
 					if(shopId != null) {
 						Set<String> shopIds = shopMaps.keySet();
 						if(shopIds.contains(shopId)) {
@@ -86,6 +91,18 @@ public class ExcelPoiService {
 					}else {
 						shopDO = new ShopDO();
 					}
+					OrderItemsDOExample orderItemsDOExample = new OrderItemsDOExample();
+					OrderItemsDOExample.Criteria criteria2 = orderItemsDOExample.createCriteria();
+					criteria2.andOrderIdEqualTo(entity.getId());
+					List<OrderItemsDO> orderItemsDOS = orderItemsDOMapper.selectByExample(orderItemsDOExample);
+					if(orderItemsDOS != null && orderItemsDOS.size() > 0) {
+						itemDO = orderItemsDOMapper.selectItemByOrderId(entity.getId());
+						log.info("参数:{}",itemDO);
+					}else {
+						// 表示对应的订单号没有关联明细表， 暂无数据
+						itemDO = new ItemDO("","","","");
+					}
+
 					Row dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
 					cellTable = dataRow.createCell(0);//订单编号
 					cellTable.setCellValue(entity.getOrderNo());
@@ -98,24 +115,24 @@ public class ExcelPoiService {
 
 
 					cellTable = dataRow.createCell(2);//门店CRM
-					cellTable.setCellValue(shopDO.getCrm() == null ? "" : shopDO.getCrm());
+					cellTable.setCellValue(shopDO.getCrm());
 					cellTable.setCellStyle(styleTable);
 
 					cellTable = dataRow.createCell(3);//门店名称
-					cellTable.setCellValue(shopDO.getName() == null ? "" : shopDO.getName());
+					cellTable.setCellValue(shopDO.getName());
 					cellTable.setCellStyle(styleTable);
 
 					cellTable = dataRow.createCell(4);//省份
-					cellTable.setCellValue(shopDO.getProvince() == null ? "" : shopDO.getProvince());
+					cellTable.setCellValue(shopDO.getProvince());
 					cellTable.setCellStyle(styleTable);
 
 
 					cellTable = dataRow.createCell(5);//城市
-					cellTable.setCellValue(shopDO.getCity() == null ? "" : shopDO.getCity());
+					cellTable.setCellValue(shopDO.getCity());
 					cellTable.setCellStyle(styleTable);
 
 					cellTable = dataRow.createCell(6);//门店地址
-					cellTable.setCellValue(shopDO.getAddress() == null ? "" : shopDO.getAddress());
+					cellTable.setCellValue(shopDO.getAddress());
 					cellTable.setCellStyle(styleTable);
 
 					cellTable = dataRow.createCell(7);//订单创建日期
@@ -140,16 +157,24 @@ public class ExcelPoiService {
 					cellTable.setCellValue(entity.getReceiverMobile());
 					cellTable.setCellStyle(styleTable);
 
-					cellTable = dataRow.createCell(12);//价格
+					cellTable = dataRow.createCell(12);//产品标题
+					cellTable.setCellValue(itemDO.getItemNames());
+					cellTable.setCellStyle(styleTable);
+
+					cellTable = dataRow.createCell(13);//商品CODE
+					cellTable.setCellValue(itemDO.getItemIds());
+					cellTable.setCellStyle(styleTable);
+
+					cellTable = dataRow.createCell(14);//价格
 					cellTable.setCellValue(entity.getItemAmount());
 					cellTable.setCellStyle(styleTable);
 
 					//TODO 数量待定
-					cellTable = dataRow.createCell(13);//数量
-					cellTable.setCellValue(timeToString(entity.getFinishTime()));
+					cellTable = dataRow.createCell(15);//数量
+					cellTable.setCellValue(itemDO.getItemNums());
 					cellTable.setCellStyle(styleTable);
 
-					cellTable = dataRow.createCell(14);//支付金额
+					cellTable = dataRow.createCell(16);//支付金额
 					cellTable.setCellValue(entity.getActualPayment());
 					cellTable.setCellStyle(styleTable);
 
@@ -166,7 +191,7 @@ public class ExcelPoiService {
 								paymentType = "";
 						}
 					}
-					cellTable = dataRow.createCell(15);//支付方式
+					cellTable = dataRow.createCell(17);//支付方式
 					cellTable.setCellValue(paymentType);
 					cellTable.setCellStyle(styleTable);
 
@@ -190,7 +215,7 @@ public class ExcelPoiService {
 						}
 					}
 
-					cellTable = dataRow.createCell(16);//订单状态
+					cellTable = dataRow.createCell(18);//订单状态
 					cellTable.setCellValue(orderStatus);
 					cellTable.setCellStyle(styleTable);
 
@@ -219,11 +244,11 @@ public class ExcelPoiService {
 								serviceStatus = "";
 						}
 					}
-					cellTable = dataRow.createCell(17);//安装状态
+					cellTable = dataRow.createCell(19);//安装状态
 					cellTable.setCellValue(serviceStatus);
 					cellTable.setCellStyle(styleTable);
 
-					cellTable = dataRow.createCell(18);//是否有赠品
+					cellTable = dataRow.createCell(20);//是否有赠品
 					cellTable.setCellValue(entity.getIsGift().equals("Y") ? "是" : "否");
 					cellTable.setCellStyle(styleTable);
 
@@ -240,11 +265,11 @@ public class ExcelPoiService {
 								sourceType = "";
 						}
 					}
-					cellTable = dataRow.createCell(19);//订单来源
+					cellTable = dataRow.createCell(21);//订单来源
 					cellTable.setCellValue(sourceType);
 					cellTable.setCellStyle(styleTable);
 
-					cellTable = dataRow.createCell(20);//消费者备注
+					cellTable = dataRow.createCell(22);//消费者备注
 					cellTable.setCellValue(entity.getRemark());
 					cellTable.setCellStyle(styleTable);
 				}
@@ -259,6 +284,13 @@ public class ExcelPoiService {
 			log.error(e.getMessage(),e);
 		}
 		return workbook;
+	}
+
+	private ExcelPoiReq changeTime(ExcelPoiReq req) {
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		req.setBegTime(sdf.format(new Date(Long.parseLong(req.getBegTime()))));
+		req.setEndTime(sdf.format(new Date(Long.parseLong(req.getEndTime()))));
+		return req;
 	}
 
 	private String timeToString(Date time) {
