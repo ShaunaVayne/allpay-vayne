@@ -2,6 +2,7 @@ package cn.vayne.datasource;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 /**
  * @Author: WangKun
@@ -10,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @ProjectName: allpay-vayne
  * @Version: 1.0.0
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class AppDatasource {
 	public static void main(String[] args) {
 		SpringApplication.run(AppDatasource.class,args);
