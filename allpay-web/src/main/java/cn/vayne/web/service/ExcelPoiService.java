@@ -3,8 +3,10 @@ package cn.vayne.web.service;
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
 import cn.vayne.web.mapper.OrderInfoMapper;
 import cn.vayne.web.mapper.OrderItemsDOMapper;
+import cn.vayne.web.mapper.OrderItemsSkuDOMapper;
 import cn.vayne.web.mapper.ShopDOMapper;
 import cn.vayne.web.model.*;
+import cn.vayne.web.utils.CacheUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -13,14 +15,14 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @Author: WangKun
@@ -42,6 +44,12 @@ public class ExcelPoiService {
 	@Autowired
 	private OrderItemsDOMapper orderItemsDOMapper;
 
+	@Autowired
+	private OrderItemsSkuDOMapper orderItemsSkuDOMapper;
+
+	@Resource
+	private CacheUtils cacheUtils;
+
 	public HSSFWorkbook excelOut(ExcelPoiReq req) {
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		OrderInfoExample example = new OrderInfoExample();
@@ -51,28 +59,20 @@ public class ExcelPoiService {
 		List<OrderInfo> entities = orderInfoMapper.selectByExample(example);
 		req = changeTime(req);
 		// 组合查询
+		List<ItemSumDo> itemSumDos = orderItemsDOMapper.selectItemByTime(req);
+		itemSumDos.stream().forEach(e-> cacheUtils.itemsNumToCache(e));
+
 		List<ItemDO> itemDOS = orderInfoMapper.selectItemByTime(req);
-		HashMap<String, ItemDO> itemMap = itemDOS.stream().collect(Collectors.toMap(
-				e -> e.getOrderId(),
-				e -> e,
-				(x, y) -> {
-					throw new AssertionError();
-				},
-				HashMap::new
-		));
+		itemDOS.stream().forEach(e -> cacheUtils.itemsDOToCache(e));
+
 		ShopDOExample shopDOExample = new ShopDOExample();
 		ShopDOExample.Criteria criteria1 = shopDOExample.createCriteria();
 		criteria1.andIsDeleteNotEqualTo(1);
 		List<ShopDO> shopDOS = shopDOMapper.selectByExample(shopDOExample);
-		HashMap<String, ShopDO> shopMaps = shopDOS.stream().collect(Collectors.toMap(
-				e -> String.valueOf(e.getId()),
-				e -> e,
-				(x, y) -> {
-					throw new AssertionError();
-				},
-				HashMap::new
-		));
+		shopDOS.stream().forEach(e -> cacheUtils.shopDOToCache(e));
 
+		List<SkuItemDo> skuItemDos = orderItemsSkuDOMapper.selectItemByTime(req);
+		skuItemDos.stream().forEach(e -> cacheUtils.skuItemsToCache(e));
 		try {
 			if(entities.size() > 0) {
 				Sheet sheet = workbook.createSheet("订单统计表");
@@ -83,7 +83,7 @@ public class ExcelPoiService {
 				CellStyle styleTable = getContentStyle(workbook);
 				Row titleRow = sheet.createRow(sheet.getLastRowNum());
 				// TODO  用户id
-				String[] column = { "订单编号","用户昵称","门店CRM","门店名称","省份","城市","门店地址","订单创建日期","订单支付日期","订单核销日期","消费者姓名","消费者联系方式","产品标题","商品CODE","价格","数量","支付金额","支付方式","订单状态","安装状态","是否有赠品","订单来源","消费者备注"};
+				String[] column = { "订单编号","用户昵称","门店CRM","门店名称","省份","城市","门店地址","订单创建日期","订单支付日期","订单核销日期","消费者姓名","消费者联系方式","产品标题","商品CODE","规格","价格","数量","支付金额","支付方式","订单状态","安装状态","是否有赠品","订单来源","消费者备注"};
 				Cell cellTitle = null;
 				for (int i = 0; i < column.length; i++) {
 					cellTitle = titleRow.createCell(i);
@@ -93,25 +93,19 @@ public class ExcelPoiService {
 				Cell cellTable = null;
 				ShopDO shopDO = null;
 				ItemDO itemDO = null;
+				ItemSumDo itemSumDo = null;
+				SkuItemDo skuItemDo = null;
 				for (OrderInfo entity : entities) {
 					String shopId = String.valueOf(entity.getShopId());
+					shopDO = new ShopDO();
 					if(shopId != null) {
-						Set<String> shopIds = shopMaps.keySet();
-						if(shopIds.contains(shopId)) {
-							shopDO = shopMaps.get(shopId);
-						}else {
-							shopDO = new ShopDO();
-						}
-					}else {
-						shopDO = new ShopDO();
+						shopDO.setId(entity.getShopId());
+						shopDO = cacheUtils.getShopDOForCache(shopDO);
 					}
 					String orderNo = entity.getOrderNo();
-					Set<String> itemOrderIds = itemMap.keySet();
-					if(itemOrderIds.contains(orderNo)) {
-						itemDO = itemMap.get(orderNo);
-					}else {
-						itemDO = new ItemDO("","","","");
-					}
+					itemDO = new ItemDO();
+					itemDO.setOrderId(orderNo);
+					itemDO = cacheUtils.getitemDOForCache(itemDO);
 					Row dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
 					cellTable = dataRow.createCell(0);//订单编号
 					cellTable.setCellValue(entity.getOrderNo());
@@ -166,24 +160,33 @@ public class ExcelPoiService {
 					cellTable.setCellValue(entity.getReceiverMobile());
 					cellTable.setCellStyle(styleTable);
 
+					skuItemDo = new SkuItemDo();
+					skuItemDo.setOrderId(entity.getOrderNo());
+					skuItemDo = cacheUtils.getSkuItemsForCache(skuItemDo);
 					cellTable = dataRow.createCell(12);//产品标题
-					cellTable.setCellValue(itemDO.getItemNames());
+					cellTable.setCellValue(skuItemDo.getSkuName());
 					cellTable.setCellStyle(styleTable);
 
 					cellTable = dataRow.createCell(13);//商品CODE
-					cellTable.setCellValue(itemDO.getItemIds());
+					cellTable.setCellValue(skuItemDo.getSkuId());
 					cellTable.setCellStyle(styleTable);
 
-					cellTable = dataRow.createCell(14);//价格
+					cellTable = dataRow.createCell(14);//规格
+					cellTable.setCellValue(skuItemDo.getSpecifications());
+					cellTable.setCellStyle(styleTable);
+
+					cellTable = dataRow.createCell(15);//价格
 					cellTable.setCellValue(entity.getItemAmount());
 					cellTable.setCellStyle(styleTable);
 
-					//TODO 数量待定
-					cellTable = dataRow.createCell(15);//数量
-					cellTable.setCellValue(itemDO.getItemNums());
+					itemSumDo = new ItemSumDo();
+					itemSumDo.setOrderId(entity.getOrderNo());
+					itemSumDo = cacheUtils.getItemsNumForCache(itemSumDo);
+					cellTable = dataRow.createCell(16);//数量
+					cellTable.setCellValue(itemSumDo.getItemNums());
 					cellTable.setCellStyle(styleTable);
 
-					cellTable = dataRow.createCell(16);//支付金额
+					cellTable = dataRow.createCell(17);//支付金额
 					cellTable.setCellValue(entity.getActualPayment());
 					cellTable.setCellStyle(styleTable);
 
@@ -200,7 +203,7 @@ public class ExcelPoiService {
 								paymentType = "";
 						}
 					}
-					cellTable = dataRow.createCell(17);//支付方式
+					cellTable = dataRow.createCell(18);//支付方式
 					cellTable.setCellValue(paymentType);
 					cellTable.setCellStyle(styleTable);
 
@@ -224,7 +227,7 @@ public class ExcelPoiService {
 						}
 					}
 
-					cellTable = dataRow.createCell(18);//订单状态
+					cellTable = dataRow.createCell(19);//订单状态
 					cellTable.setCellValue(orderStatus);
 					cellTable.setCellStyle(styleTable);
 
@@ -253,11 +256,11 @@ public class ExcelPoiService {
 								serviceStatus = "";
 						}
 					}
-					cellTable = dataRow.createCell(19);//安装状态
+					cellTable = dataRow.createCell(20);//安装状态
 					cellTable.setCellValue(serviceStatus);
 					cellTable.setCellStyle(styleTable);
 
-					cellTable = dataRow.createCell(20);//是否有赠品
+					cellTable = dataRow.createCell(21);//是否有赠品
 					cellTable.setCellValue(entity.getIsGift().equals("Y") ? "是" : "否");
 					cellTable.setCellStyle(styleTable);
 
@@ -274,11 +277,11 @@ public class ExcelPoiService {
 								sourceType = "";
 						}
 					}
-					cellTable = dataRow.createCell(21);//订单来源
+					cellTable = dataRow.createCell(22);//订单来源
 					cellTable.setCellValue(sourceType);
 					cellTable.setCellStyle(styleTable);
 
-					cellTable = dataRow.createCell(22);//消费者备注
+					cellTable = dataRow.createCell(23);//消费者备注
 					cellTable.setCellValue(entity.getRemark());
 					cellTable.setCellStyle(styleTable);
 				}
@@ -289,11 +292,20 @@ public class ExcelPoiService {
 						"数据为空 或查询方式错误请重新查询并导出" + "##请优先点击查询按钮 再点击导出");
 
 			}
+			// 清空缓存
+			shopDOS.stream().forEach(e-> {
+				cacheUtils.removeShopCache(e.getId());
+			});
+			itemDOS.stream().forEach(e -> {
+				cacheUtils.removeItemsCache(e.getOrderId());
+			});
 		}catch(Exception e) {
 			log.error(e.getMessage(),e);
 		}
 		return workbook;
 	}
+
+
 
 	private ExcelPoiReq changeTime(ExcelPoiReq req) {
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -342,5 +354,17 @@ public class ExcelPoiService {
 		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 		style.setFont(font);
 		return style;
+	}
+
+	@CachePut(value = "itemDo2", key = "#e.orderId")
+	public ItemDO test(ItemDO e) {
+		log.info("id为{}入缓存",e);
+		return e;
+	}
+
+	@Cacheable(value = "itemDo2", key = "#p.orderId")
+	public ItemDO testGet(ItemDO p) {
+		log.info("id为{}出缓存",p);
+		return p;
 	}
 }

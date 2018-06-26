@@ -1,6 +1,8 @@
 package cn.vayne.web.mapper;
 
+import cn.vayne.web.domain.DTO.ExcelPoiReq;
 import cn.vayne.web.model.ItemDO;
+import cn.vayne.web.model.ItemSumDo;
 import cn.vayne.web.model.OrderItemsDO;
 import cn.vayne.web.model.OrderItemsDOExample;
 import java.util.List;
@@ -20,4 +22,5 @@ public interface OrderItemsDOMapper {
 
 	ItemDO selectItemByOrderId(Long id);
 
+	List<ItemSumDo> selectItemByTime(ExcelPoiReq req);
 }

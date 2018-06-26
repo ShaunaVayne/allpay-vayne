@@ -76,4 +76,16 @@ public class Test {
 		String sd = sdf.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
 		System.out.println(sd);
 	}
+
+	@org.junit.Test
+	public void test5() throws ParseException {
+		//2018-06-26 00:00:01	1529942401000	2018-06-26 23:59:59	1530028799000
+		String s = "2018-06-26 23:59:59";
+		String res;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date date = simpleDateFormat.parse(s);
+		long ts = date.getTime();
+		res = String.valueOf(ts);
+		System.out.println(res);
+	}
 }

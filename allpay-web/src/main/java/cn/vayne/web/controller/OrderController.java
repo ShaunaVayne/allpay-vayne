@@ -1,6 +1,7 @@
 package cn.vayne.web.controller;
 
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
+import cn.vayne.web.model.ItemDO;
 import cn.vayne.web.service.ExcelPoiService;
 import cn.vayne.web.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: WangKun
@@ -75,6 +79,33 @@ public class OrderController {
 				+ "?=";
 		filename = filename.replaceAll("\r\n", "");
 		return filename;
+	}
+
+	@RequestMapping(value = "/insert")
+	public Object test() {
+		ItemDO itemDO1 = new ItemDO("1","test1","ok","ok");
+		ItemDO itemDO2 = new ItemDO("2","test2","ok","ok");
+		ItemDO itemDO3 = new ItemDO("3","test3","ok","ok");
+		ItemDO itemDO4 = new ItemDO("4","test4","ok","ok");
+		ItemDO itemDO5 = new ItemDO("5","test5","ok","ok");
+		List<ItemDO> itemDOS = Arrays.asList(itemDO1, itemDO2, itemDO3, itemDO4, itemDO5);
+		itemDOS.stream().forEach( e -> {
+			excelPoiService.test(e);
+		});
+		return "ok";
+	}
+
+	@RequestMapping(value = "/get")
+	public Object get() {
+		List<String> strs = Arrays.asList("1","2","3","4","5");
+		ArrayList<ItemDO> people = new ArrayList<>();
+		strs.stream().forEach(e -> {
+			ItemDO p = new ItemDO();
+			p.setOrderId(e);
+			p = excelPoiService.testGet(p);
+			people.add(p);
+		});
+		return people;
 	}
 
 }
