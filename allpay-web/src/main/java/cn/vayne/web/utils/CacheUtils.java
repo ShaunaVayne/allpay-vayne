@@ -1,6 +1,5 @@
 package cn.vayne.web.utils;
 
-import cn.vayne.web.model.ItemDO;
 import cn.vayne.web.model.ItemSumDo;
 import cn.vayne.web.model.ShopDO;
 import cn.vayne.web.model.SkuItemDo;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @Author: WangKun
- * @Description:
+ * @Description: 数据缓存处理类
  * @Date: Created in 2018/6/26 下午5:43
  * @ProjectName: allpay-vayne
  * @Version: 1.0.0
@@ -21,15 +20,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CacheUtils {
 
-	@Cacheable(value = "itemDOs", key = "#itemDO.orderId")
-	public ItemDO getitemDOForCache(ItemDO itemDO) {
-		return itemDO;
-	}
-
-	@CachePut(value = "itemDOs", key = "#itemDO.orderId")
-	public ItemDO itemsDOToCache(ItemDO itemDO) {
-		return itemDO;
-	}
 
 	@CachePut(value = "shopDOs", key = "#shopDO.id")
 	public ShopDO shopDOToCache(ShopDO shopDO) {
@@ -41,18 +31,12 @@ public class CacheUtils {
 		return shopDO;
 	}
 
-	@CacheEvict(value = "itemDOs")
-	public void removeItemsCache(String orderId) {}
-
-	@CacheEvict(value = "shopDOs")
-	public void removeShopCache(Long id) {}
-
 	@CachePut(value = "itemSumDOs", key = "#itemSumDo.orderId")
 	public ItemSumDo itemsNumToCache(ItemSumDo itemSumDo) {
 		return itemSumDo;
 	}
 
-	@CachePut(value = "itemSumDOs", key = "#itemSumDo.orderId")
+	@Cacheable(value = "itemSumDOs", key = "#itemSumDo.orderId")
 	public ItemSumDo getItemsNumForCache(ItemSumDo itemSumDo) {
 		return itemSumDo;
 	}
@@ -62,8 +46,17 @@ public class CacheUtils {
 		return e;
 	}
 
-	@CachePut(value = "skuItems", key = "#e.orderId")
+	@Cacheable(value = "skuItems", key = "#e.orderId")
 	public SkuItemDo getSkuItemsForCache(SkuItemDo e) {
 		return e;
 	}
+
+	@CacheEvict(value = "itemSumDOs")
+	public void removeItemSumCache(String orderId) { }
+
+	@CacheEvict(value = "skuItems")
+	public void removeSkuItemCache(String orderId) {}
+
+	@CacheEvict(value = "shopDOs")
+	public void removeShopCache(Long id) {}
 }

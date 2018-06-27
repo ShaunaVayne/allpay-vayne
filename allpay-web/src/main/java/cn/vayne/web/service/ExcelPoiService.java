@@ -62,9 +62,6 @@ public class ExcelPoiService {
 		List<ItemSumDo> itemSumDos = orderItemsDOMapper.selectItemByTime(req);
 		itemSumDos.stream().forEach(e-> cacheUtils.itemsNumToCache(e));
 
-		List<ItemDO> itemDOS = orderInfoMapper.selectItemByTime(req);
-		itemDOS.stream().forEach(e -> cacheUtils.itemsDOToCache(e));
-
 		ShopDOExample shopDOExample = new ShopDOExample();
 		ShopDOExample.Criteria criteria1 = shopDOExample.createCriteria();
 		criteria1.andIsDeleteNotEqualTo(1);
@@ -92,7 +89,6 @@ public class ExcelPoiService {
 				}
 				Cell cellTable = null;
 				ShopDO shopDO = null;
-				ItemDO itemDO = null;
 				ItemSumDo itemSumDo = null;
 				SkuItemDo skuItemDo = null;
 				for (OrderInfo entity : entities) {
@@ -103,9 +99,6 @@ public class ExcelPoiService {
 						shopDO = cacheUtils.getShopDOForCache(shopDO);
 					}
 					String orderNo = entity.getOrderNo();
-					itemDO = new ItemDO();
-					itemDO.setOrderId(orderNo);
-					itemDO = cacheUtils.getitemDOForCache(itemDO);
 					Row dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
 					cellTable = dataRow.createCell(0);//订单编号
 					cellTable.setCellValue(entity.getOrderNo());
@@ -114,8 +107,6 @@ public class ExcelPoiService {
 					cellTable = dataRow.createCell(1);//用户昵称
 					cellTable.setCellValue(entity.getUserId());
 					cellTable.setCellStyle(styleTable);
-
-
 
 					cellTable = dataRow.createCell(2);//门店CRM
 					cellTable.setCellValue(shopDO.getCrm());
@@ -142,7 +133,6 @@ public class ExcelPoiService {
 					cellTable.setCellValue(timeToString(entity.getCreatedTime()));
 					cellTable.setCellStyle(styleTable);
 
-					// TODO 支付时间字段待确认
 					cellTable = dataRow.createCell(8);//订单支付日期
 					cellTable.setCellValue(timeToString(entity.getPayTime()));
 					cellTable.setCellStyle(styleTable);
@@ -161,7 +151,7 @@ public class ExcelPoiService {
 					cellTable.setCellStyle(styleTable);
 
 					skuItemDo = new SkuItemDo();
-					skuItemDo.setOrderId(entity.getOrderNo());
+					skuItemDo.setOrderId(String.valueOf(entity.getId()));
 					skuItemDo = cacheUtils.getSkuItemsForCache(skuItemDo);
 					cellTable = dataRow.createCell(12);//产品标题
 					cellTable.setCellValue(skuItemDo.getSkuName());
@@ -180,7 +170,7 @@ public class ExcelPoiService {
 					cellTable.setCellStyle(styleTable);
 
 					itemSumDo = new ItemSumDo();
-					itemSumDo.setOrderId(entity.getOrderNo());
+					itemSumDo.setOrderId(String.valueOf(entity.getId()));
 					itemSumDo = cacheUtils.getItemsNumForCache(itemSumDo);
 					cellTable = dataRow.createCell(16);//数量
 					cellTable.setCellValue(itemSumDo.getItemNums());
@@ -293,12 +283,9 @@ public class ExcelPoiService {
 
 			}
 			// 清空缓存
-			shopDOS.stream().forEach(e-> {
-				cacheUtils.removeShopCache(e.getId());
-			});
-			itemDOS.stream().forEach(e -> {
-				cacheUtils.removeItemsCache(e.getOrderId());
-			});
+			shopDOS.stream().forEach(e-> cacheUtils.removeShopCache(e.getId()));
+			itemSumDos.stream().forEach(e-> cacheUtils.removeItemSumCache(e.getOrderId()));
+			skuItemDos.stream().forEach(e-> cacheUtils.removeSkuItemCache(e.getOrderId()));
 		}catch(Exception e) {
 			log.error(e.getMessage(),e);
 		}
