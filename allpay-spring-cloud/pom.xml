@@ -12,6 +12,7 @@
 
 	<modules>
 		<module>allpay-server</module>
+		<module>allpay-config</module>
 	</modules>
 
 	<parent>
