@@ -50,8 +50,10 @@ public class ExcelPoiService {
 	@Resource
 	private CacheUtils cacheUtils;
 
+	private HSSFWorkbook workbook;
+
 	public HSSFWorkbook excelOut(ExcelPoiReq req) {
-		HSSFWorkbook workbook = new HSSFWorkbook();
+		workbook = new HSSFWorkbook();
 		OrderInfoExample example = new OrderInfoExample();
 		OrderInfoExample.Criteria criteria = example.createCriteria();
 		criteria.andCreatedTimeGreaterThanOrEqualTo(new Date(Long.parseLong(req.getBegTime())));
