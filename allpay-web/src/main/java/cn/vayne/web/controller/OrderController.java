@@ -55,9 +55,9 @@ public class OrderController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping("testMapper")
-	public void testMapper(ExcelPoiReq req, HttpServletResponse response, HttpServletRequest request) {
-		log.info("请求参数:{}",req);
-		HSSFWorkbook workbook = excelPoiService.excelOut(req);
+	public void testMapper(ExcelPoiReq req, HttpServletResponse response, HttpServletRequest request) throws Exception {
+		/*log.info("请求参数:{}",req);
+		HSSFWorkbook workbook = excelPoiService.excelOut(req,"1a");
 		String dateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 		response.setContentType("application/x-excel;charset=UTF-8");
 		String filename = "订单统计表"+ dateTime +".xls";
@@ -69,7 +69,7 @@ public class OrderController {
 			workbook.write(response.getOutputStream());
 		} catch (Exception e) {
 			log.error("导出报表错误:{}",e);
-		}
+		}*/
 	}
 
 	public static String encodeDownloadFilename(String filename, String agent)

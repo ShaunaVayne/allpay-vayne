@@ -1,16 +1,15 @@
 package cn.vayne.test.demo;
 
 import cn.vayne.test.BaseTest;
+import cn.vayne.web.config.ApplicationContextProvider;
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
 import cn.vayne.web.service.ExcelPoiService;
+import cn.vayne.web.service.ExcelPoiTask;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.annotation.Resource;
 
 /**
  * @Author: WangKun
@@ -25,19 +24,39 @@ public class Main extends BaseTest {
 	@Autowired
 	private ExcelPoiService excelPoiService;
 
+	@Resource
+	private ExcelPoiTask excelPoiTask;
+
 	@Test
 	public void test() throws Exception {
-		long startTime = System.currentTimeMillis();
+		/*long startTime = System.currentTimeMillis();
 		ExcelPoiReq excelPoiReq = new ExcelPoiReq();
 		excelPoiReq.setBegTime("1529942401000");
 		excelPoiReq.setEndTime("1530028799000");
-		HSSFWorkbook hssfWorkbook = excelPoiService.excelOut(excelPoiReq);
+		excelPoiService.excelOut(excelPoiReq,"1a");
 		String dateTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 		String filename = "/Users/vayne/myself/tip/data/"+"订单统计表" + dateTime +".xls";
 		FileOutputStream os = new FileOutputStream(filename);
 		hssfWorkbook.write(os);
 		os.flush();
 		long endTime = System.currentTimeMillis();
-		log.info("报表导出执行时间{}",endTime - startTime);
+		log.info("报表导出执行时间{}",endTime - startTime);*/
+	}
+
+	@Test
+	public void test2() throws Exception {
+		ExcelPoiTask m1 = ApplicationContextProvider.getBean("excelPoiTask", ExcelPoiTask.class);
+		ExcelPoiTask m2 = ApplicationContextProvider.getBean("excelPoiTask", ExcelPoiTask.class);
+		ExcelPoiTask m3 = ApplicationContextProvider.getBean("excelPoiTask", ExcelPoiTask.class);
+		ExcelPoiTask m4 = ApplicationContextProvider.getBean("excelPoiTask", ExcelPoiTask.class);
+		ExcelPoiTask m5 = ApplicationContextProvider.getBean("excelPoiTask", ExcelPoiTask.class);
+		ExcelPoiReq req = new ExcelPoiReq();
+		m1.getExcelPoiService().excelOut(req,"1a");
+		m2.getExcelPoiService().excelOut(req,"2b");
+		m3.getExcelPoiService().excelOut(req,"3c");
+		m4.getExcelPoiService().excelOut(req,"4d");
+		m5.getExcelPoiService().excelOut(req,"5e");
+		log.info("end");
+
 	}
 }

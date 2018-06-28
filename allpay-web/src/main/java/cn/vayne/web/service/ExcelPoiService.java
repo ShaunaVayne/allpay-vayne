@@ -17,12 +17,15 @@ import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * @Author: WangKun
@@ -52,7 +55,8 @@ public class ExcelPoiService {
 
 	private HSSFWorkbook workbook;
 
-	public HSSFWorkbook excelOut(ExcelPoiReq req) {
+	@Async("asyncServiceExecutor")
+	public synchronized Future<HSSFWorkbook> excelOut(ExcelPoiReq req, String flag) throws Exception {
 		workbook = new HSSFWorkbook();
 		OrderInfoExample example = new OrderInfoExample();
 		OrderInfoExample.Criteria criteria = example.createCriteria();
@@ -291,7 +295,7 @@ public class ExcelPoiService {
 		}catch(Exception e) {
 			log.error(e.getMessage(),e);
 		}
-		return workbook;
+		return new AsyncResult<HSSFWorkbook>(workbook);
 	}
 
 
