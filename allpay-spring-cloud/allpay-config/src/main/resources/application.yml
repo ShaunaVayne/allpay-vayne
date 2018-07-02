@@ -9,10 +9,12 @@ spring:
   cloud:
     config:
       server:
-        git:
-          username: ahaqwjwk@163.com
-          password: 3g2,eday726
-          uri: https://github.com/ShaunaVayne/spring-config-demo.git
-          search-paths: my-config
+        native:
+          search-locations: classpath:/shared
+  profiles:
+    active: native
   application:
     name: allpay-config
+logging:
+  file: ./log/allpay-config.log
+
