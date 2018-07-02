@@ -1,13 +1,18 @@
 server:
-  port: 8088
+  port: 2001
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:2000/eureka/
+# git管理配置
 spring:
-  application:
-    name: my-client
   cloud:
     config:
       server:
         git:
-         uri: https://github.com/ShaunaVayne/spring-config-demo.git
-         searchPaths: my-config
-         username: ahaqwjwk@163.com
-         password: 3g2,eday726
+          username: ahaqwjwk@163.com
+          password: 3g2,eday726
+          uri: https://github.com/ShaunaVayne/spring-config-demo.git
+          search-paths: my-config
+  application:
+    name: allpay-config
