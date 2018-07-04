@@ -12,6 +12,7 @@
 		<module>allpay-spring-cloud</module>
 		<module>allpay-web</module>
 		<module>allpay-dynamic-datasource</module>
+		<module>allpay-elasticsearch</module>
 	</modules>
 
 
