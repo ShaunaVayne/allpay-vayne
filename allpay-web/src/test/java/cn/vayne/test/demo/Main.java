@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -76,6 +77,19 @@ public class Main {
 		}catch(Exception e) {
 		    log.error("");
 		}
+	}
+
+	@Test
+	public void test3() {
+
+		//浮点数,存在精度问题
+		double d1 = 0.19*6;
+		System.out.println(d1);//1.1400000000000001
+		//采用BigDecimal 来解决精度问题
+		BigDecimal bd1 = new BigDecimal("0.19");
+		BigDecimal bd2 = new BigDecimal("6");
+		BigDecimal bd3 = bd1.multiply(bd2);
+		System.out.println(bd3);//1.14
 	}
 
 }
