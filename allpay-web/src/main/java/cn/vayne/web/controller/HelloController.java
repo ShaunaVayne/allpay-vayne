@@ -20,7 +20,7 @@ import java.util.concurrent.Future;
 
 /**
  * @Author: WangKun
- * @Description: text
+ * @Description: test
  * @Date: Created in 2018/6/28 下午5:57
  * @ProjectName: allpay-vayne
  * @Version: 1.0.0
