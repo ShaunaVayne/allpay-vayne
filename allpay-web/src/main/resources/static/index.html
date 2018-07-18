@@ -23,14 +23,59 @@
 </body>
 <script>
     function test() {
-        console.log(22);
+        /*console.log(22);
         $.ajax({
+            url : "http://localhost:8088/excel/getExcel?begTime=2018-06-15 00:00:01&endTime=2018-06-19 00:00:01",
+            cache : false,
+			type: "GET"
+        });*/
+		console.log('success');
+        ﻿var xhh;
+		if(window.XMLHttpRequest) {
+			xhh = new XMLHttpRequest();
+		} else {
+			xhh = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xhh.onreadystatechange= function () {
+		﻿   if(xhh.readyState == 4 && xhh.status == 200) {
+				var name = xhh.getResponseHeader("Content-disposition");
+				console.log(name);
+				var filename = name.substring(20,name.length);
+				var blob = new Blob([xhh.response], {type: 'text/xls'});
+				var csvUrl = URL.createObjectURL(blob);
+				var link = document.createElement('a');
+				link.href = csvUrl;
+				link.download = filename;
+				link.click();
+			}
+		};
+		xhh.open(﻿"GET","http://localhost:8088/excel/getExcel?begTime=2018-06-15 00:00:01&endTime=2018-06-19 00:00:01",true);
+        ﻿xhh.send();
+		/*var url = serverUrlBase + "/server/images/" + mapid + "/files/png";
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', url, true);
+		xhr.responseType = "blob";
+		xhr.setRequestHeader("client_type", "DESKTOP_WEB");
+		xhr.setRequestHeader("desktop_web_access_key", _desktop_web_access_key);
+		xhr.onload = function() {
+			if (this.status == 200) {
+				var blob = this.response;
+				var img = document.createElement("img");
+				img.onload = function(e) {
+					window.URL.revokeObjectURL(img.src);
+				};
+				img.src = window.URL.createObjectURL(blob);
+				$("#imgcontainer").html(img);
+			}
+		}
+		xhr.send();*/
+        /*$.ajax({
             url: "http://localhost:8088/excel/getExcel?begTime=2018-06-15 00:00:01&endTime=2018-06-19 00:00:01",
 			cache: false,
 			success: function(data){
 				console.log(data);
 			}
-        });
+        });*/
 	}
 	function test3() {
 		console.log(33);
