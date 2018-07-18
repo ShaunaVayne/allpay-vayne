@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -91,5 +93,22 @@ public class Main {
 		BigDecimal bd3 = bd1.multiply(bd2);
 		System.out.println(bd3);//1.14
 	}
+
+	@Test
+	public void test4() {
+		Date date = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String format = dateFormat.format(date);
+		System.out.println(format);
+		Date yesterday = new Date(new Date().getTime() - 86400000L);
+		String format1 = dateFormat.format(yesterday);
+		System.out.println(format1+"昨天");
+	}
+
+	@Test
+	public void test5() {
+		int i = 2;
+	}
+
 
 }
