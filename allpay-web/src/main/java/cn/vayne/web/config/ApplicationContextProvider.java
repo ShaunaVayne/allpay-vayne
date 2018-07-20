@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @Author: WangKun
- * @Description:
+ * @Description: 网速
  * @Date: Created in 2018/6/28 下午5:36
  * @ProjectName: allpay-vayne
  * @Version: 1.0.0
