@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -29,6 +31,8 @@ public class Main {
 
 	@Resource
 	private ExcelPoiTask excelPoiTask;
+
+	private static Calendar cal = new GregorianCalendar();
 
 	@Test
 	public void test2() throws Exception {
@@ -107,7 +111,78 @@ public class Main {
 
 	@Test
 	public void test5() {
-		int i = 2;
+		Calendar todayStart = Calendar.getInstance();
+		todayStart.set(Calendar.HOUR, 0);
+		todayStart.set(Calendar.MINUTE, 0);
+		todayStart.set(Calendar.SECOND, 0);
+		todayStart.set(Calendar.MILLISECOND, 0);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		System.out.println(sdf.format(todayStart.getTime()));
+	}
+
+	/**
+	 * 昨天
+	 */
+	@Test
+	public void test6() {
+		Calendar cal = new GregorianCalendar();
+		cal.setTime(getDayBegin());
+		cal.add(Calendar.DAY_OF_MONTH, -1);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		System.out.println(sdf.format(cal.getTime()));//2018-07-24 00:00:00
+	}
+
+	@Test
+	public void test7() {
+		Calendar cal = new GregorianCalendar();
+		cal.setTime(getDayEnd());
+		cal.add(Calendar.DAY_OF_MONTH, -1);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		System.out.println(sdf.format(cal.getTime()));//2018-07-24 23:59:59
+	}
+
+	/**
+	 * 7天
+	 */
+	@Test
+	public void test8() {
+		//Calendar cal = new GregorianCalendar();
+		cal.setTime(getDayEnd());
+		cal.add(Calendar.DAY_OF_MONTH, -7);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		System.out.println(sdf.format(cal.getTime()));//2018-07-24 23:59:59
+
+		cal.setTime(getDayBegin());
+		cal.add(Calendar.DAY_OF_MONTH,0);
+		System.out.println(sdf.format(cal.getTime()));//2018-06-25 00:00:00
+	}
+
+
+
+	public static Date getDayBegin() {
+		Calendar cal = new GregorianCalendar();
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
+
+	public static Date getDayEnd() {
+		Calendar cal = new GregorianCalendar();
+		cal.set(Calendar.HOUR_OF_DAY, 23);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		cal.set(Calendar.MILLISECOND, 59);
+		return cal.getTime();
+	}
+
+	@Test
+	public void test10() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String format = sdf.format(DateUtil.getDayBegin(-1));
+		System.out.println(format);
+		System.out.println(sdf.format(DateUtil.getDayEnd(-1)));
 	}
 
 
