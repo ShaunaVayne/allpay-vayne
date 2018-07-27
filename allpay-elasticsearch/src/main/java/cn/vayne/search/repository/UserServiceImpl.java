@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void saveEntity(User user) {
-		Index index = new Index.Builder(user).index(user.INDEX_NAME).type(user.TYPE).build();
+		Index index = new Index.Builder(user).index(User.INDEX_NAME).type(User.TYPE).build();
 		try {
 			jestClient.execute(index);
 			log.info("ES 插入完成");
@@ -64,7 +64,8 @@ public class UserServiceImpl implements UserService {
 				.addIndex(User.INDEX_NAME).addType(User.TYPE).build();
 		try {
 			JestResult result = jestClient.execute(search);
-			return result.getSourceAsObjectList(User.class);
+			List<User> sourceAsObjectList = result.getSourceAsObjectList(User.class);
+			return sourceAsObjectList;
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
