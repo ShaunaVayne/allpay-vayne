@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: allpay-service
+  cloud:
+    config:
+      discovery:
+        enabled: true # 默认是false, 设置为true表示使用注册中心的configServer而不是自己配置的configServer的uri
+        serviceId: allpay-config #指定config Server在服务中的serviceId, 默认为configServer
+      profile: dev
+      fail-fast: true
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka/
+

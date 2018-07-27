@@ -1,2 +1,4 @@
 server:
   port: 3000
+logging:
+  file: ./log/allpay-service.log
