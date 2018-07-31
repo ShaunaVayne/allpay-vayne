@@ -180,7 +180,7 @@ public class Main {
 	@Test
 	public void test10() {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String format = sdf.format(DateUtil.getDayBegin(-1));
+		String format = sdf.format(DateUtil.getDayBegin(-7));
 		System.out.println(format);
 		System.out.println(sdf.format(DateUtil.getDayEnd(-1)));
 	}
