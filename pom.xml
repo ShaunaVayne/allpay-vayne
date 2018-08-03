@@ -13,6 +13,7 @@
 		<module>allpay-web</module>
 		<module>allpay-dynamic-datasource</module>
 		<module>allpay-elasticsearch</module>
+		<module>allpay-dal</module>
 	</modules>
 
 
