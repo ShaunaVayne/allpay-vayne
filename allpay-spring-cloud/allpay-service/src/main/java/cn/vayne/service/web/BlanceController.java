@@ -1,8 +1,10 @@
 package cn.vayne.service.web;
 
 import cn.vayne.service.entity.OpenBlanceReq;
+import com.vayne.dal.dao.mapper.OrderGradeLogDOMapper;
 import com.vayne.dal.dao.model.OrderGradeLogDO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +23,8 @@ import java.util.Date;
 @Slf4j
 public class BlanceController {
 
-	/*@Autowired
-	private OrderGradeLogDOMapper orderGradeLogDOMapper;*/
+	@Autowired
+	private OrderGradeLogDOMapper orderGradeLogDOMapper;
 
 	@RequestMapping(value = "open")
 	public Object open(@RequestBody OpenBlanceReq openBlanceReq) {
@@ -37,8 +39,8 @@ public class BlanceController {
 		orderGradeLogDO.setCreator("wangkun");
 		orderGradeLogDO.setModifier("wangkun");
 		orderGradeLogDO.setProprietorId("CONTINENTAL");
-		//int i = orderGradeLogDOMapper.insertSelective(orderGradeLogDO);
-		int i = 2;
+		int i = orderGradeLogDOMapper.insertSelective(orderGradeLogDO);
+		//int i = 2;
 		return i == 1 ? "success" : "fail";
 	}
 

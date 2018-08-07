@@ -1,4 +1,4 @@
-package com.vayne.dal.dao.plugin;
+package cn.vayne.service.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.github.pagehelper.PageHelper;
