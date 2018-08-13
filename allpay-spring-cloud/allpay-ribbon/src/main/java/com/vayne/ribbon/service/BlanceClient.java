@@ -1,15 +1,14 @@
 package com.vayne.ribbon.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.vayne.ribbon.model.OpenBlanceReq;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Author: WangKun
@@ -19,6 +18,7 @@ import java.util.List;
  * @Version: 1.0.0
  */
 @Service
+@Slf4j
 public class BlanceClient {
 
 	@Autowired
@@ -30,15 +30,15 @@ public class BlanceClient {
 	}
 
 	@HystrixCommand(fallbackMethod = "queryBlanceBlack")
-	public List queryBlance(String blanceQuery, HttpEntity<String> entity) {
-		List result = restTemplate.postForObject(blanceQuery, entity, List.class);
+	public String queryBlance(String blanceQuery, HttpEntity<String> entity) {
+		String result = restTemplate.postForObject(blanceQuery, entity, String.class);
+		JSONObject jsonObject = JSONObject.parseObject(result);
+		log.info("jsonObject:{}", jsonObject);
 		return result;
 	}
 
-	public List queryBlanceBlack(String blanceQuery, HttpEntity<String> entity) {
-		ArrayList<String> strings = new ArrayList<>();
-		strings.add("error");
-		return strings;
+	public String queryBlanceBlack(String blanceQuery, HttpEntity<String> entity) {
+		return "error";
 
 	}
 }

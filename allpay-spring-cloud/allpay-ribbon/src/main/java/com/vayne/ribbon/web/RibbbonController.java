@@ -59,13 +59,13 @@ public class RibbbonController {
 	}
 
 	@RequestMapping(value = "query")
-	public List queryBlance(@RequestBody QueryBlanceReq queryBlanceReq) {
+	public String queryBlance(@RequestBody QueryBlanceReq queryBlanceReq) {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.parseMediaType("application/json; charset=UTF-8"));
 		String jsonParam = JSONObject.toJSONString(queryBlanceReq);
 		log.info("参数:{}", jsonParam);
 		HttpEntity<String> entity = new HttpEntity<>(jsonParam, httpHeaders);
-		List result = blanceClient.queryBlance(blanceQuery, entity);
+		String result = blanceClient.queryBlance(blanceQuery, entity);
 		return result;
 	}
 }

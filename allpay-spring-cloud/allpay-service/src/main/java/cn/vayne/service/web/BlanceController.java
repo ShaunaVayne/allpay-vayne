@@ -2,6 +2,7 @@ package cn.vayne.service.web;
 
 import cn.vayne.service.entity.OpenBlanceReq;
 import cn.vayne.service.entity.QueryBlanceReq;
+import com.vayne.dal.base.BaseResp;
 import com.vayne.dal.dao.mapper.OrderGradeLogDOMapper;
 import com.vayne.dal.dao.model.OrderGradeLogDO;
 import com.vayne.dal.dao.model.OrderGradeLogDOExample;
@@ -47,21 +48,26 @@ public class BlanceController {
 	}
 
 	@RequestMapping(value = "query")
-	public List<OrderGradeLogDO> query(@RequestBody QueryBlanceReq queryBlanceReq) {
+	public BaseResp<List<OrderGradeLogDO>> query(@RequestBody QueryBlanceReq queryBlanceReq) {
 		log.info("queryBlanceReq:{}", queryBlanceReq);
+		BaseResp<List<OrderGradeLogDO>> resp = null;
 		OrderGradeLogDOExample example = new OrderGradeLogDOExample();
 		OrderGradeLogDOExample.Criteria criteria = example.createCriteria();
 		criteria.andShopIdEqualTo(queryBlanceReq.getShopId());
 		criteria.andProprietorIdEqualTo(queryBlanceReq.getProprietorId());
 		List<OrderGradeLogDO> orderGradeLogDOS = orderGradeLogDOMapper.selectByExample(example);
-		if(orderGradeLogDOS != null && orderGradeLogDOS.size() > 0) {
-			return orderGradeLogDOS;
-		}else {
-			return null;
+		try {
+		    if(orderGradeLogDOS != null && orderGradeLogDOS.size() > 0) {
+				resp = BaseResp.buildSuccessResp(BaseResp.class).setData(orderGradeLogDOS);
+			}else {
+		    	log.warn("查询信息为空");
+				resp = BaseResp.buildSuccessResp(BaseResp.class).setData("查询信息为空!");
+			}
+		}catch(Exception e) {
+			resp = BaseResp.buildFailResp(e, "商品结算页", BaseResp.class);
 		}
-
+		return resp;
 	}
-
 
 
 }
