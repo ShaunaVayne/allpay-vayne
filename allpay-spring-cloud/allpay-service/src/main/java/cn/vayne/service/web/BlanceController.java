@@ -49,6 +49,17 @@ public class BlanceController {
 
 	@RequestMapping(value = "query")
 	public BaseResp<List<OrderGradeLogDO>> query(@RequestBody QueryBlanceReq queryBlanceReq) {
+		/**
+		 * 测试Hystrix服务降级:
+		 * 作为提供方输出了应当返回的结果,但是因为返回前延迟5秒,此时消费方触发了服务请求超时异常, 服务消费方则通过HystrixCommand注解中指定的
+		 * 降级逻辑进行执行, 因此在页面返回error, 注意: 注解指定的降级方法方法名必须为注解指定的, 同时参数返回值必须与主方法一致.
+		 * 此种机制, 对自身的服务起到了基础保护, 同时还为异常提供了自动的降级切换机制.
+		 */
+		/*try {
+			Thread.sleep(5000L);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}*/
 		log.info("queryBlanceReq:{}", queryBlanceReq);
 		BaseResp<List<OrderGradeLogDO>> resp = null;
 		OrderGradeLogDOExample example = new OrderGradeLogDOExample();
@@ -66,6 +77,7 @@ public class BlanceController {
 		}catch(Exception e) {
 			resp = BaseResp.buildFailResp(e, "商品结算页", BaseResp.class);
 		}
+		log.info("返回结果:{}", resp);
 		return resp;
 	}
 
