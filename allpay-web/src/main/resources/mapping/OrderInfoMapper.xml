@@ -469,4 +469,10 @@
 	  GROUP BY
 	  order_id
   </select>
+	<select id="selectTest" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from order_info
+		where shop_id = #{shopId,jdbcType=BIGINT}
+	</select>
 </mapper>

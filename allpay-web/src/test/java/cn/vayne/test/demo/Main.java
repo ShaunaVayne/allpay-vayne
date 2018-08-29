@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -183,6 +184,25 @@ public class Main {
 		String format = sdf.format(DateUtil.getDayBegin(-7));
 		System.out.println(format);
 		System.out.println(sdf.format(DateUtil.getDayEnd(-1)));
+	}
+
+	@Test
+	public void test11() {
+		StringBuffer sb = new StringBuffer();
+		for(int i = 0; i < 5; i++) {
+			sb.append(i+",");
+		}
+		String substring = sb.toString().substring(0, sb.toString().length() - 1);
+		System.out.println(substring);
+
+	}
+
+	@Test
+	public void test12() throws ParseException {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String str = "2018-08-17 00:00:00";
+		Date parse = format.parse(str);
+		log.info("sss"+parse);
 	}
 
 

@@ -21,4 +21,6 @@ public interface OrderInfoMapper {
 
 	List<ItemDO> selectItemByTime(ExcelPoiReq req);
 
+	OrderInfo selectTest(Long shopId);
+
 }
