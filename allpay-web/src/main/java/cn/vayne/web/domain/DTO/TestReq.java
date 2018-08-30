@@ -1,7 +1,9 @@
 package cn.vayne.web.domain.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
  */
 @Data
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class TestReq {
 
 	private String name;

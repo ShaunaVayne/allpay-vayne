@@ -2,6 +2,7 @@ package cn.vayne.test.demo;
 
 import cn.vayne.web.config.ApplicationContextProvider;
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
+import cn.vayne.web.domain.DTO.TestReq2;
 import cn.vayne.web.service.ExcelPoiService;
 import cn.vayne.web.service.ExcelPoiTask;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +13,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -203,6 +202,56 @@ public class Main {
 		String str = "2018-08-17 00:00:00";
 		Date parse = format.parse(str);
 		log.info("sss"+parse);
+	}
+
+	@Test
+	public void test13() {
+		TestReq2 main1 = new TestReq2("wangkun1", 1, "sh1");
+		TestReq2 main2 = new TestReq2("wangkun2", 2, "sh2");
+		TestReq2 main3 = new TestReq2("wangkun3", 3, "sh3");
+		TestReq2 main4 = new TestReq2("wangkun4", 4, "sh4");
+		List<TestReq2> list = Arrays.asList(main1, main2, main3, main4);
+
+		TestReq2 entity1 = new TestReq2("vayne1", 1, "bj1");
+		TestReq2 entity2 = new TestReq2("vayne2", 2, "bj2");
+		//TestReq2 entity3 = new TestReq2("vayne3", 3, "bj3");
+		TestReq2 entity3 = new TestReq2("wangkun3", 3, "sh3");
+		TestReq2 entity4 = new TestReq2("vayne4", 4, "bj4");
+
+		List<TestReq2> list1 = Arrays.asList(entity1, entity2, entity3, entity4);
+
+		Map<Integer, List<TestReq2>> listDiff = findListDiff(list, list1);
+		System.out.println(listDiff);
+	}
+
+	private Map<Integer, List<TestReq2>> findListDiff(List<TestReq2> rps1, List<TestReq2> rps2){
+		//判断不能为空
+		if(rps1 == null || rps1.isEmpty() || rps2 == null || rps1.isEmpty()) return null;
+		//保存最后的数据
+		Map<Integer, List<TestReq2>>  mapList = new HashMap<Integer, List<TestReq2>>(3);
+
+		//复制rps1，作为备份
+		List<TestReq2> rps1_bak = new ArrayList<TestReq2>(rps1);
+
+		//1、获取rps1中与rps2中不同的元素
+		rps1.removeAll(rps2);
+
+		//2、获取rps1和rps2中相同的元素
+		rps1_bak.removeAll(rps1);
+
+		//3、获取rps2中与rps1中不同的元素
+		rps2.removeAll(rps1_bak);
+
+		//经过此转换后rps1中数据与rps2中的数据完全不同
+		//rps1_bak是rps1和rps2的交集
+		//rps2中的数据与rps1中的数据完全不同
+
+		mapList.put(0, rps1);//rps1中独有的数据
+		mapList.put(1, rps1_bak);//交集的数据
+		mapList.put(2, rps2);//rps2中的独有数据
+
+
+		return mapList;
 	}
 
 

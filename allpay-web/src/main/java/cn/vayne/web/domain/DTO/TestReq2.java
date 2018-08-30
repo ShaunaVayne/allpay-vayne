@@ -1,6 +1,8 @@
 package cn.vayne.web.domain.DTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -12,6 +14,8 @@ import lombok.ToString;
  */
 @Data
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class TestReq2 {
 
 	private String name;
