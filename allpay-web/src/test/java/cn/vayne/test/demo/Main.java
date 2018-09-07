@@ -6,6 +6,7 @@ import cn.vayne.web.domain.DTO.TestReq2;
 import cn.vayne.web.service.ExcelPoiService;
 import cn.vayne.web.service.ExcelPoiTask;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +34,10 @@ public class Main {
 	private ExcelPoiTask excelPoiTask;
 
 	private static Calendar cal = new GregorianCalendar();
+
+	private static final String FORMATE_DATE = "yyyy-MM-dd";
+	private static final String FORMATE_SECONDS = "HH:mm:ss";
+	private static final String FORMATE_FULL = FORMATE_DATE.concat(" ").concat(FORMATE_SECONDS);
 
 	@Test
 	public void test2() throws Exception {
@@ -222,6 +227,31 @@ public class Main {
 
 		Map<Integer, List<TestReq2>> listDiff = findListDiff(list, list1);
 		System.out.println(listDiff);
+	}
+
+	@Test
+	public void test14() {
+		DateTime dateTime = new DateTime();
+		dateTime = dateTime.plusMonths(-1);
+		System.out.println(dateTime.toString("yyyy-MM-dd HH:mm:ss"));
+
+		DateTime dt = new DateTime();
+		dt = dt.plusDays(-30);
+		//dt = dt.plusMonths(-1);
+		System.out.println(dt.withTimeAtStartOfDay().toDate());
+		System.out.println(dt.withTimeAtStartOfDay().toString(FORMATE_FULL));
+		System.out.println(dt.millisOfDay().withMaximumValue().toString(FORMATE_FULL));
+
+	}
+
+	@Test
+	public void test15() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date dayBegin = DateUtil2.getDayBegin(-1);
+		Date dayEnd = DateUtil2.getDayEnd(-1);
+		System.out.println(sdf.format(dayBegin));
+		System.out.println(sdf.format(dayEnd));
+
 	}
 
 	private Map<Integer, List<TestReq2>> findListDiff(List<TestReq2> rps1, List<TestReq2> rps2){
