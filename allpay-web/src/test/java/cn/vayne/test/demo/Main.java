@@ -16,6 +16,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Author: WangKun
@@ -252,6 +254,20 @@ public class Main {
 		System.out.println(sdf.format(dayBegin));
 		System.out.println(sdf.format(dayEnd));
 
+	}
+
+	@Test
+	public void test16() {
+		//String msg = "17621749522aa";
+		String msg = "";
+		String regExp = "^((13[0-9])|(15[^4])|(18[0,2,3,5-9])|(17[0-8])|(147))\\d{8}$";
+		Pattern p = Pattern.compile(regExp);
+		Matcher m = p.matcher(msg);
+		System.out.println(m.matches());
+
+		Req req = new Req();
+		req.setPageNum(2);
+		log.info("req:{}",req);
 	}
 
 	private Map<Integer, List<TestReq2>> findListDiff(List<TestReq2> rps1, List<TestReq2> rps2){
