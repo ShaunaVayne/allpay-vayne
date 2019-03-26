@@ -1,11 +1,17 @@
 package cn.vayne.test.demo;
 
+import cn.vayne.test.domain.Apple;
+import cn.vayne.test.domain.PurchaseProductReq;
+import cn.vayne.test.domain.VehicleV1;
+import cn.vayne.test.domain.VehicleV2;
 import cn.vayne.web.config.ApplicationContextProvider;
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
 import cn.vayne.web.domain.DTO.TestReq2;
 import cn.vayne.web.service.ExcelPoiService;
 import cn.vayne.web.service.ExcelPoiTask;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.assertj.core.util.Lists;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +46,9 @@ public class Main {
 	private static final String FORMATE_DATE = "yyyy-MM-dd";
 	private static final String FORMATE_SECONDS = "HH:mm:ss";
 	private static final String FORMATE_FULL = FORMATE_DATE.concat(" ").concat(FORMATE_SECONDS);
+
+
+	public static final String orderCodePrefix = "THD";
 
 	@Test
 	public void test2() throws Exception {
@@ -270,6 +279,204 @@ public class Main {
 		log.info("req:{}",req);
 	}
 
+	@Test
+	public void test17() {
+		VehicleV2 vehicleV21 = new VehicleV2(1l, "京888", "京");
+		VehicleV2 vehicleV22 = new VehicleV2(2l, "京888", "京1");
+		VehicleV2 vehicleV23 = new VehicleV2(3l, "京888", "京1");
+		List<VehicleV2> vehicleV2s = new ArrayList<>();
+		vehicleV2s.add(vehicleV21);
+		vehicleV2s.add(vehicleV22);
+		vehicleV2s.add(vehicleV23);
+		//vehicleV2s.stream().filter(e -> e.getId().equals(e.getId()) && )
+		System.out.println(vehicleV2s.size());
+		Set<VehicleV2> vehicleV2s1 = new HashSet<>();
+		vehicleV2s1.add(vehicleV21);
+		vehicleV2s1.add(vehicleV22);
+		vehicleV2s1.add(vehicleV23);
+//		vehicleV2s1.addAll(vehicleV2s);
+		System.out.println(vehicleV2s1.size());
+
+	}
+
+	@Test
+	public void test19() {
+		String key  = "THD20181028";
+		Date dayBegin = cn.vayne.web.utils.DateUtil.getDayBegin(-1);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
+		String format = sdf.format(dayBegin);
+		System.out.println(format);
+	}
+
+	@Test
+	public void test20() {
+		String orderCode = "0001";
+		Date dayBegin = cn.vayne.web.utils.DateUtil.getDayBegin(0);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
+		String format = sdf.format(dayBegin);
+		orderCode = orderCodePrefix + format + orderCode;
+		System.out.println(orderCode);
+
+	}
+
+	@Test
+	public void test21() {
+		PurchaseProductReq req1 = new PurchaseProductReq();
+		PurchaseProductReq req2 = new PurchaseProductReq();
+		req1.setProductPrice(1l);
+		req1.setQuantityLimit(10);
+		req1.setQuantityExpect(10);
+
+		req2.setProductPrice(2l);
+		req2.setQuantityLimit(20);
+		req2.setQuantityExpect(20);
+
+		List<PurchaseProductReq> reqs = Arrays.asList(req1, req2);
+
+		Long amountRelease = 0l; //实收/退金额
+		Long amountExpect = 0l; //应收/退金额
+
+		for (PurchaseProductReq req : reqs) {
+			Long productPrice = req.getProductPrice();
+			Integer quantityLimit = req.getQuantityLimit();//
+			Integer quantityExpect = req.getQuantityExpect();
+			Long quantityLimitSum = productPrice * quantityLimit;//可退数量
+			Long quantityExpectSum = productPrice * quantityExpect;//退货数量
+			amountRelease += quantityExpectSum;
+			amountExpect += quantityLimitSum;
+		}
+
+		log.info("amountRelease:{},amountExpect:{}", amountRelease, amountExpect);
+
+	}
+
+	@Test
+	public void test22() {
+		String s =  "";
+		if(StringUtils.isNotBlank(s)) {
+			System.out.println("ok");
+		}else {
+			System.out.println("not ok");
+		}
+
+	}
+
+	@Test
+	public void test23() {
+		System.out.println(new Date());
+		String bookBeginusetime = "2018-09-25 00:00:00";
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			Long beginUseTime = sdf.parse(bookBeginusetime).getTime();
+			log.info("bookBeginusetime:{}", bookBeginusetime);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		String startDate = "2017-08-15";
+		String endDate = "2017-08-15";
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		int startDay = 0;
+		int endDay = 0;
+
+		try {
+			Date dateStart = format.parse(startDate);
+			Date datEnd = format.parse(endDate);
+
+			startDay = (int) (dateStart.getTime() / 1000);
+			endDay = (int) (datEnd.getTime() / 1000);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.err.println(startDay);
+		System.err.println(endDay);
+	}
+
+
+	@Test
+	public void test18() {
+		VehicleV1 v1 = new VehicleV1();
+		v1.setId(1l);
+		v1.setLicensePlateFlag("京");
+		v1.setLicensePlateNumber("11");
+		v1.setVehicleModel("11");
+		v1.setColor("aaa");
+
+		VehicleV1 v2 = new VehicleV1();
+		v2.setId(2l);
+		v2.setLicensePlateFlag("京");
+		v2.setLicensePlateNumber("11");
+		v2.setVehicleModel("11");
+
+		VehicleV1 v3 = new VehicleV1();
+		v3.setId(3l);
+		v3.setLicensePlateFlag("京");
+		v3.setLicensePlateNumber("22");
+		v3.setVehicleModel("22");
+
+		List<VehicleV1> v1s = new ArrayList<>();
+		v1s.add(v1);
+		v1s.add(v2);
+		v1s.add(v3);
+
+		System.out.println(v1s.size());
+
+
+
+		Set<VehicleV1> v2s = new HashSet<>();
+		v2s.addAll(v1s);
+		System.out.println(v2s.size());
+
+
+
+	}
+
+	@Test
+	public void test24() {
+		Long l = 1542167322205000L;
+		String id = String.valueOf(l);
+		String time = "2018-11-14";
+
+	}
+
+	@Test
+	public void test26() {
+		String a = null;
+
+		String b = "";
+
+		String c = "1";
+
+		if (StringUtils.isNotEmpty(b)) {
+			System.out.println("okk");
+		}
+
+		if(b != null) {
+			System.out.println("ok222");
+		}
+
+		List<String> list = new ArrayList<>();
+
+		if(list.isEmpty()) {
+			System.out.println("空");
+		}
+	}
+
+	@Test
+	public void test25() {
+		ArrayList<Apple> inventory = Lists.newArrayList(
+				new Apple(5, "red"),
+				new Apple(5, "aed"),
+				new Apple(1, "green"),
+				new Apple(15, "green"),
+				new Apple(2, "red"));
+		inventory.sort((a, b) -> a.getWeight() - b.getWeight());
+
+		System.out.println(inventory);
+
+	}
+
+
 	private Map<Integer, List<TestReq2>> findListDiff(List<TestReq2> rps1, List<TestReq2> rps2){
 		//判断不能为空
 		if(rps1 == null || rps1.isEmpty() || rps2 == null || rps1.isEmpty()) return null;
@@ -299,6 +506,8 @@ public class Main {
 
 		return mapList;
 	}
+
+
 
 
 }
