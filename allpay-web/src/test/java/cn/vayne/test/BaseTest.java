@@ -1,6 +1,9 @@
 package cn.vayne.test;
 
 import cn.vayne.web.AppWeb;
+import cn.vayne.web.mapper.UserMapper;
+import cn.vayne.web.model.ParameterConfig;
+import cn.vayne.web.model.User;
 import cn.vayne.web.utils.DateUtil;
 import cn.vayne.web.utils.PurchaseRedisCache;
 import cn.vayne.web.utils.RedisUtils;
@@ -39,6 +42,9 @@ public class BaseTest {
 	@Autowired
 	private PurchaseRedisCache purchaseRedisCache;
 
+	@Autowired
+	private UserMapper userMapper;
+
 	@Test
 	public void test() {
 		//String code = serviceOrderRedisCache.getCode(workOrderRedisPrefix, 105l);
@@ -62,6 +68,25 @@ public class BaseTest {
 		}
 		System.out.println(s);
 
+	}
+
+	@Test
+	public void test3() {
+		User user = new User();
+		user.setUserName("王琨");
+		ParameterConfig p1 = new ParameterConfig(1,"sex","男");
+		ParameterConfig p2 = new ParameterConfig(2,"location","上海");
+		List<ParameterConfig> favoriteList = Arrays.asList(p1, p2);
+		user.setFavorites(favoriteList);
+		userMapper.addUser(user);
+		System.out.println("success-sssssss");
+	}
+
+	@Test
+	public void test4() {
+		User user = userMapper.getUser(4);
+		System.out.println(user);
+		System.out.println("success-sssssss");
 	}
 
 	public String getDate(Integer i) {

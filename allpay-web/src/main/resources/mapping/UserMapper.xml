@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.vayne.web.mapper.UserMapper">
+	<resultMap id="userResult" type="cn.vayne.web.model.User">
+		<id column="id" jdbcType="BIGINT" property="id" />
+		<result column="user_name" jdbcType="VARCHAR" property="userName" />
+		<result column="favorites" jdbcType="VARCHAR" property="favorites" typeHandler="cn.vayne.web.handler.ListTypeHandler" javaType="java.util.List" />
+	</resultMap>
+	<insert id="addUser" parameterType="cn.vayne.web.model.User">
+		insert into user set user_name = #{userName},favorites = #{favorites,typeHandler=cn.vayne.web.handler.ListTypeHandler}
+	</insert>
+	<select id="getUser" parameterType="java.lang.Integer" resultMap="userResult">
+		select * from user where id=#{id}
+	</select>
+</mapper>

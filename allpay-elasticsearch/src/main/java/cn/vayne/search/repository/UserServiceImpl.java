@@ -1,3 +1,4 @@
+/*
 package cn.vayne.search.repository;
 
 import cn.vayne.search.entity.User;
@@ -15,13 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * @Author: WangKun
- * @Description:
- * @Date: Created in 2018/7/3 下午5:31
- * @ProjectName: allpay-vayne
- * @Version: 1.0.0
- */
+
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -72,3 +67,4 @@ public class UserServiceImpl implements UserService {
 		return null;
 	}
 }
+*/

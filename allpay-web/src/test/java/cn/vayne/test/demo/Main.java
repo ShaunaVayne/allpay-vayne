@@ -7,8 +7,11 @@ import cn.vayne.test.domain.VehicleV2;
 import cn.vayne.web.config.ApplicationContextProvider;
 import cn.vayne.web.domain.DTO.ExcelPoiReq;
 import cn.vayne.web.domain.DTO.TestReq2;
+import cn.vayne.web.model.ParameterConfig;
 import cn.vayne.web.service.ExcelPoiService;
 import cn.vayne.web.service.ExcelPoiTask;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.assertj.core.util.Lists;
@@ -473,6 +476,39 @@ public class Main {
 		inventory.sort((a, b) -> a.getWeight() - b.getWeight());
 
 		System.out.println(inventory);
+
+	}
+
+	@Test
+	public void test27() {
+		ParameterConfig p1 = new ParameterConfig(1,"a","1");
+		ParameterConfig p2 = new ParameterConfig(2,"b","2");
+		List<ParameterConfig> parameter = Arrays.asList(p1, p2);
+		StringBuffer sb = new StringBuffer();
+		sb.append("[");
+		for (ParameterConfig parameterConfig : parameter) {
+			sb.append("{")
+					.append("\"id\":").append(parameterConfig.getId()).append(",")
+					.append("\"key\":").append("\"").append(parameterConfig.getKey()).append("\",")
+					.append("\"value\":").append("\"").append(parameterConfig.getValue()).append("\"")
+					.append("},");
+		}
+		String s = sb.toString().substring(0,sb.toString().length() - 1) + "]";
+		System.out.println(s);
+	}
+
+	@Test
+	public void test28() {
+		String msg = "[{\"id\":1,\"key\":\"sex\",\"value\":\"男\"},{\"id\":2,\"key\":\"location\",\"value\":\"上海\"}]";
+
+		JSONArray jsonArray = JSONArray.parseArray(msg);
+
+		List<ParameterConfig> parameterConfigs = new ArrayList<>();
+		for (Object obj : jsonArray) {
+			ParameterConfig parameterConfig = ((JSONObject) obj).toJavaObject(ParameterConfig.class);
+			parameterConfigs.add(parameterConfig);
+		}
+		System.out.println(parameterConfigs);
 
 	}
 
