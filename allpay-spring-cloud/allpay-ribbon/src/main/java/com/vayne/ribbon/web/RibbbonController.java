@@ -43,6 +43,9 @@ public class RibbbonController {
 	@Value("${allpay.service.blance.query}")
 	private String blanceQuery;
 
+	/*@Value("${allpay.service.test.test_02}")
+	private String test_02;*/
+
 	@Autowired
 	private BlanceClient blanceClient;
 
@@ -67,5 +70,11 @@ public class RibbbonController {
 		HttpEntity<String> entity = new HttpEntity<>(jsonParam, httpHeaders);
 		String result = blanceClient.queryBlance(blanceQuery, entity);
 		return result;
+	}
+
+	@RequestMapping(value = "test02")
+	public String test_02() {
+		String s = restTemplate.postForObject("http://ALLPAY-SERVICE/test/test_02", null, String.class);
+		return s;
 	}
 }

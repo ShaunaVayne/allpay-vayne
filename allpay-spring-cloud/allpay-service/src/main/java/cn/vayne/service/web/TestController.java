@@ -1,9 +1,11 @@
 package cn.vayne.service.web;
 
 import cn.vayne.service.entity.UserEntity;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,8 +42,13 @@ public class TestController {
 		UserEntity wangkun4 = new UserEntity(4, "wangkun4");
 		UserEntity wangkun5 = new UserEntity(5, "wangkun5");
 		List<UserEntity> userEntities = Arrays.asList(wangkun1, wangkun2, wangkun3, wangkun4, wangkun5);
-		log.info("/add:service_msg:{},result:{}",services.get(0),userEntities);
+		log.info("/add:service_msg:{},result:{}",JSON.toJSONString(services),userEntities);
 		return userEntities;
+	}
+
+	@PostMapping(value = "test_02")
+	public String test_02() {
+		return "test_02";
 	}
 
 }
